@@ -1,0 +1,48 @@
+name: stock_portfolio
+description: "持仓管家 - 多平台股票仓位聚合分析"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # Database
+  drift: ^2.25.0
+  drift_flutter: ^0.2.4
+  sqlite3_flutter_libs: ^0.5.28
+
+  # Networking
+  dio: ^5.7.0
+
+  # Charts
+  fl_chart: ^0.70.2
+
+  # Formatting
+  intl: ^0.20.2
+
+  # Swipe actions
+  flutter_slidable: ^3.1.1
+
+  # Supabase (auth + cloud storage)
+  supabase_flutter: ^2.8.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Drift code generation
+  drift_dev: ^2.25.0
+  build_runner: ^2.4.14
+
+flutter:
+  uses-material-design: true
