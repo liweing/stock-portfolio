@@ -1,0 +1,33 @@
+// Vercel Serverless Function: 天天基金代理（绕过 CORS）
+// Web 端访问 /api/fund?code=000071 → 这里转发到 fundgz.1234567.com.cn
+export default async function handler(req, res) {
+  const { code, rt } = req.query;
+
+  if (!code || !/^\d{6}$/.test(code)) {
+    res.status(400).json({ error: 'Invalid fund code' });
+    return;
+  }
+
+  try {
+    const timestamp = rt || Date.now();
+    const response = await fetch(
+      `https://fundgz.1234567.com.cn/js/${code}.js?rt=${timestamp}`,
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0',
+          'Referer': 'https://fund.eastmoney.com/',
+        },
+      }
+    );
+
+    const text = await response.text();
+
+    // 允许浏览器跨域
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    res.setHeader('Cache-Control', 's-maxage=30');
+    res.status(200).send(text);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
