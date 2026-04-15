@@ -93,6 +93,28 @@ class PositionPnl {
   double get pnlCny => marketValueCny - costValueCny;
 }
 
+/// 单个平台的盈亏统计（全部以人民币计）
+class PlatformStat {
+  final BrokerageType platform;
+  final double marketValue;   // 总市值
+  final double cost;          // 总成本
+  final double totalPnl;      // 累计盈亏
+  final double totalPnlPercent; // 累计收益率 %
+  final double dailyPnl;      // 今日盈亏
+
+  PlatformStat({
+    required this.platform,
+    required this.marketValue,
+    required this.cost,
+    required this.totalPnl,
+    required this.totalPnlPercent,
+    required this.dailyPnl,
+  });
+
+  bool get isProfit => totalPnl >= 0;
+  bool get isDailyUp => dailyPnl >= 0;
+}
+
 /// 饼图分配项
 class AllocationItem {
   final String label;
@@ -116,6 +138,7 @@ class PortfolioSummary {
   final double dailyPnlPercent;
   final List<AllocationItem> allocationByStock;
   final List<AllocationItem> allocationByPlatform;
+  final List<PlatformStat> platformStats;
   final List<PositionPnl> positionDetails;
 
   PortfolioSummary({
@@ -127,6 +150,7 @@ class PortfolioSummary {
     required this.dailyPnlPercent,
     required this.allocationByStock,
     required this.allocationByPlatform,
+    required this.platformStats,
     required this.positionDetails,
   });
 
@@ -139,6 +163,7 @@ class PortfolioSummary {
         dailyPnlPercent: 0,
         allocationByStock: [],
         allocationByPlatform: [],
+        platformStats: [],
         positionDetails: [],
       );
 

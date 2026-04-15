@@ -44,6 +44,21 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
                   totalPnlPercent: summary.totalPnlPercent,
                 ),
 
+                // 按平台盈亏明细
+                Padding(
+                  padding:
+                      const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text(
+                    '按平台汇总',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ..._buildPlatformStats(summary, theme),
+
+                const Divider(height: 32),
+
                 // 今日涨跌排行标题
                 Padding(
                   padding:
@@ -124,6 +139,83 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildPlatformStats(
+      PortfolioSummary summary, ThemeData theme) {
+    if (summary.platformStats.isEmpty) return const [];
+    return summary.platformStats.map((stat) {
+      final totalColor =
+          stat.isProfit ? Colors.red.shade700 : Colors.green.shade700;
+      final dailyColor =
+          stat.isDailyUp ? Colors.red.shade700 : Colors.green.shade700;
+
+      return Container(
+        margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    stat.platform.label,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '¥${FormatUtil.formatAmount(stat.marketValue)}',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: _StatItem(
+                    label: '今日盈亏',
+                    value: FormatUtil.formatPnl(stat.dailyPnl, '¥'),
+                    color: dailyColor,
+                  ),
+                ),
+                Expanded(
+                  child: _StatItem(
+                    label: '累计盈亏',
+                    value: FormatUtil.formatPnl(stat.totalPnl, '¥'),
+                    color: totalColor,
+                  ),
+                ),
+                Expanded(
+                  child: _StatItem(
+                    label: '收益率',
+                    value: FormatUtil.formatPercent(stat.totalPnlPercent),
+                    color: totalColor,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }).toList();
   }
 
   List<Widget> _buildDailyRanking(PortfolioSummary summary, ThemeData theme) {
@@ -244,6 +336,39 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
         ),
       );
     }).toList();
+  }
+}
+
+/// 平台卡片中的小数据格子
+class _StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color? color;
+
+  const _StatItem({required this.label, required this.value, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: color,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
   }
 }
 

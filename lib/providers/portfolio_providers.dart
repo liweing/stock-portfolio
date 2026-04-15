@@ -86,6 +86,29 @@ final portfolioSummaryProvider = Provider<PortfolioSummary>((ref) {
   }).toList()
     ..sort((a, b) => b.value.compareTo(a.value));
 
+  // 按平台聚合：总市值/总成本/累计盈亏/今日盈亏（都转为人民币）
+  final platformAgg = <BrokerageType, List<PositionPnl>>{};
+  for (final p in pnlList) {
+    platformAgg.putIfAbsent(p.platform, () => []).add(p);
+  }
+  final platformStats = platformAgg.entries.map((e) {
+    final list = e.value;
+    final mv = list.fold(0.0, (s, p) => s + p.marketValueCny);
+    final cost = list.fold(0.0, (s, p) => s + p.costValueCny);
+    final pnl = mv - cost;
+    final pct = cost == 0 ? 0.0 : (pnl / cost) * 100;
+    final daily = list.fold(0.0, (s, p) => s + p.dailyPnlCny);
+    return PlatformStat(
+      platform: e.key,
+      marketValue: mv,
+      cost: cost,
+      totalPnl: pnl,
+      totalPnlPercent: pct,
+      dailyPnl: daily,
+    );
+  }).toList()
+    ..sort((a, b) => b.marketValue.compareTo(a.marketValue));
+
   return PortfolioSummary(
     totalMarketValue: totalMarketValue,
     totalCost: totalCost,
@@ -95,6 +118,7 @@ final portfolioSummaryProvider = Provider<PortfolioSummary>((ref) {
     dailyPnlPercent: dailyPnlPercent,
     allocationByStock: allocationByStock,
     allocationByPlatform: allocationByPlatform,
+    platformStats: platformStats,
     positionDetails: pnlList,
   );
 });
