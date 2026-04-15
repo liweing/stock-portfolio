@@ -145,7 +145,19 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
             const SizedBox(height: 8),
             MarketSelector(
               selected: _selectedMarket,
-              onChanged: (v) => setState(() => _selectedMarket = v),
+              onChanged: (v) {
+                setState(() => _selectedMarket = v);
+                // 切换市场后，如果有代码就重新查一次名称
+                final symbol = _symbolController.text.trim();
+                if (symbol.isNotEmpty && !widget.isEditing) {
+                  // 清空旧名称以允许重新填充（只在是上次自动填充的情况下）
+                  if (_nameController.text == _lastLookedUpName) {
+                    _nameController.clear();
+                  }
+                  _debounceTimer?.cancel();
+                  _lookupStockName(symbol);
+                }
+              },
             ),
 
             const SizedBox(height: 20),
