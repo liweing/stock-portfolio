@@ -59,6 +59,22 @@ class StockPriceService {
   /// 字段: f43=最高,f44=最低,f46=开盘,f58=名称,f170=涨跌幅,f60=昨收,f43=现价
   Future<StockQuote?> _fetchFromEastMoney(
       String symbol, StockMarket market) async {
+    // 优先用推断的 market 查询
+    final quote = await _queryEastMoney(symbol, market);
+    if (quote != null) return quote;
+
+    // 如果失败，尝试沪深对调（处理 000xxx 号段同时存在于沪市指数和深市股票的情况）
+    if (market == StockMarket.sz) {
+      return await _queryEastMoney(symbol, StockMarket.sh);
+    } else if (market == StockMarket.sh) {
+      return await _queryEastMoney(symbol, StockMarket.sz);
+    }
+    return null;
+  }
+
+  /// 执行单次东方财富 API 调用
+  Future<StockQuote?> _queryEastMoney(
+      String symbol, StockMarket market) async {
     final secid = _toEastMoneySecId(symbol, market);
     if (secid == null) return null;
 
