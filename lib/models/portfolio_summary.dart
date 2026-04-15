@@ -76,6 +76,10 @@ class PositionPnl {
   /// 是否盈利
   bool get isProfit => pnl >= 0;
 
+  /// 基金的当前价是估算净值（gsz ≠ dwjz）
+  bool get isEstimated =>
+      market.isFund && (currentPrice - prevClose).abs() > 0.00001;
+
   /// 货币符号（如 $, HK$, ¥）
   String get currencySymbol => market.currencySymbol;
 
