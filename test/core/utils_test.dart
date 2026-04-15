@@ -39,12 +39,12 @@ void main() {
       expect(FormatUtil.formatPnl(1234.5, '\$'), '+\$1,234.50');
     });
 
-    test('负盈亏不额外加 - 号（abs 后用 "" 表示）', () {
-      // 实现：abs 后前面无符号
-      expect(FormatUtil.formatPnl(-100, '¥'), '¥100.00');
+    test('负盈亏显式带 - 号', () {
+      expect(FormatUtil.formatPnl(-100, '¥'), '-¥100.00');
+      expect(FormatUtil.formatPnl(-1234.5, 'HK\$'), '-HK\$1,234.50');
     });
 
-    test('0 视作正盈亏', () {
+    test('0 视作正盈亏，带 + 号', () {
       expect(FormatUtil.formatPnl(0, '¥'), '+¥0.00');
     });
   });

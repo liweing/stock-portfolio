@@ -49,7 +49,7 @@ void main() {
       expect(pctText.style?.color, Colors.red.shade700);
     });
 
-    testWidgets('亏损时显示绿色', (tester) async {
+    testWidgets('亏损时显示绿色 + - 号', (tester) async {
       await tester.pumpWidget(_wrap(const PnlSummaryCard(
         totalMarketValue: 8000,
         totalCost: 10000,
@@ -57,8 +57,8 @@ void main() {
         totalPnlPercent: -20.0,
       )));
 
-      // 负数显示为 ¥2,000.00（没有 - 号，用颜色区分）
-      final pnlText = tester.widget<Text>(find.text('¥2,000.00'));
+      // 负数显示为 -¥2,000.00（显式 - 号 + 绿色）
+      final pnlText = tester.widget<Text>(find.text('-¥2,000.00'));
       expect(pnlText.style?.color, Colors.green.shade700);
 
       final pctText = tester.widget<Text>(find.text('-20.00%'));

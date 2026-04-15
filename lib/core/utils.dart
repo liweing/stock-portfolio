@@ -15,9 +15,10 @@ class FormatUtil {
   /// 格式化整数: 1,234
   static String formatInt(double value) => _intFormat.format(value);
 
-  /// 格式化盈亏显示
+  /// 格式化盈亏显示（正数带 +，负数带 -，都带货币符号）
+  /// 示例：+¥1,234.56 / -¥1,234.56
   static String formatPnl(double pnl, String currencySymbol) {
-    final sign = pnl >= 0 ? '+' : '';
+    final sign = pnl >= 0 ? '+' : '-';
     return '$sign$currencySymbol${formatAmount(pnl.abs())}';
   }
 }
