@@ -52,4 +52,4 @@ jobs:
           node-version: '20'
 
       - name: Run API tests
-        run: node --test 'api/*.test.js'
+        run: node --test 'api/*.test.mjs'

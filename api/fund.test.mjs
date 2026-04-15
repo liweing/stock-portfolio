@@ -2,7 +2,9 @@
 // Usage: node --test api/fund.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import handler from './fund.js';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const handler = require('./fund.js');
 
 /**
  * 构造伪造的 req/res 对象，返回一个包含 state 的 context

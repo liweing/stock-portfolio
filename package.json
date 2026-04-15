@@ -2,12 +2,11 @@
   "name": "stock-portfolio-api",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "description": "Vercel serverless functions for stock-portfolio Flutter app",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test api/*.test.js"
+    "test": "node --test 'api/*.test.mjs'"
   }
 }
