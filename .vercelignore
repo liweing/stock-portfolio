@@ -1,0 +1,19 @@
+# 测试文件不需要部署
+**/*.test.js
+test/
+e2e/
+
+# Flutter 源码不需要（只部署 build/web 产物）
+lib/
+android/
+ios/
+macos/
+windows/
+linux/
+
+# 开发配置
+pubspec.yaml
+pubspec.lock
+analysis_options.yaml
+.metadata
+.flutter-plugins*
