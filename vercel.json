@@ -3,11 +3,11 @@
   "trailingSlash": false,
   "rewrites": [
     { "source": "/", "destination": "/build/web/index.html" },
-    { "source": "/:path((?!build/).*)", "destination": "/build/web/:path" }
+    { "source": "/:path((?!build/|api/).*)", "destination": "/build/web/:path" }
   ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "headers": [
         { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
         { "key": "Cross-Origin-Embedder-Policy", "value": "require-corp" }

@@ -64,12 +64,15 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
   void _onSymbolChanged() {
     if (widget.isEditing) return;
     final text = _symbolController.text.trim();
-    final guess = StockMarket.guessFromSymbol(text);
-    if (guess != null && guess != _selectedMarket) {
-      setState(() => _selectedMarket = guess);
+    // 如果用户当前选的是"基金"，就不要自动推断为股票市场
+    if (!_selectedMarket.isFund) {
+      final guess = StockMarket.guessFromSymbol(text);
+      if (guess != null && guess != _selectedMarket) {
+        setState(() => _selectedMarket = guess);
+      }
     }
 
-    // 防抖：输入停止 800ms 后自动查询股票名称
+    // 防抖：输入停止 800ms 后自动查询名称
     _debounceTimer?.cancel();
     if (text.isNotEmpty && _nameController.text.isEmpty) {
       _debounceTimer = Timer(const Duration(milliseconds: 800), () {
@@ -79,7 +82,10 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
   }
 
   Future<void> _lookupStockName(String symbol) async {
-    final market = StockMarket.guessFromSymbol(symbol) ?? _selectedMarket;
+    // 基金走基金 API，股票走股票 API
+    final market = _selectedMarket.isFund
+        ? StockMarket.fund
+        : (StockMarket.guessFromSymbol(symbol) ?? _selectedMarket);
     setState(() => _isLookingUp = true);
     try {
       final priceService = ref.read(stockPriceServiceProvider);

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../models/enums.dart';
 
 /// 股票实时报价
@@ -37,7 +38,7 @@ class StockPriceService {
     }
   }
 
-  /// 批量获取行情 - 逐个查询东方财富 API
+  /// 批量获取行情 - 根据市场路由到不同 API
   Future<List<StockQuote>> fetchQuotes(
       List<({String symbol, StockMarket market})> stocks) async {
     if (stocks.isEmpty) return [];
@@ -45,13 +46,73 @@ class StockPriceService {
     final results = <StockQuote>[];
     for (final stock in stocks) {
       try {
-        final quote = await _fetchFromEastMoney(stock.symbol, stock.market);
+        final quote = stock.market.isFund
+            ? await _fetchFromTianTianFund(stock.symbol)
+            : await _fetchFromEastMoney(stock.symbol, stock.market);
         if (quote != null) results.add(quote);
       } catch (_) {
         // 单只失败不影响其他
       }
     }
     return results;
+  }
+
+  /// 天天基金 API（支持场外开放式基金）
+  /// Web 平台因 CORS 走 Vercel 代理，APK 直连
+  /// 返回格式（JSONP）:
+  /// jsonpgz({"fundcode":"000071","name":"华夏恒生ETF联接A",
+  ///   "jzrq":"2026-04-14","dwjz":"1.5337","gsz":"1.5379",
+  ///   "gszzl":"0.28","gztime":"2026-04-15 16:00"})
+  Future<StockQuote?> _fetchFromTianTianFund(String code) async {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    // Web 走代理，APK 直连
+    final url = kIsWeb
+        ? '/api/fund?code=$code&rt=$timestamp'
+        : 'https://fundgz.1234567.com.cn/js/$code.js?rt=$timestamp';
+
+    final response = await _dio.get(
+      url,
+      options: Options(responseType: ResponseType.plain),
+    );
+
+    final raw = response.data as String?;
+    if (raw == null || raw.isEmpty) return null;
+
+    // 提取 jsonpgz(...) 里的 JSON
+    final match = RegExp(r'jsonpgz\((.*)\)').firstMatch(raw);
+    if (match == null) return null;
+    final jsonStr = match.group(1);
+    if (jsonStr == null || jsonStr.isEmpty) return null;
+
+    Map<String, dynamic> data;
+    try {
+      data = jsonDecode(jsonStr) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+
+    final name = data['name'] as String? ?? '';
+    final fundCode = data['fundcode'] as String? ?? code;
+
+    // 单位净值（昨日收盘）
+    final dwjz = double.tryParse(data['dwjz']?.toString() ?? '') ?? 0;
+    // 估算净值（实时）
+    final gsz = double.tryParse(data['gsz']?.toString() ?? '') ?? 0;
+    // 估算涨跌幅
+    final changePct = double.tryParse(data['gszzl']?.toString() ?? '') ?? 0;
+
+    // 当前价用估算净值（无则退回单位净值）
+    final currentPrice = gsz > 0 ? gsz : dwjz;
+    if (currentPrice <= 0) return null;
+
+    return StockQuote(
+      symbol: fundCode,
+      name: name,
+      market: StockMarket.fund,
+      currentPrice: currentPrice,
+      prevClose: dwjz,
+      changePct: changePct,
+    );
   }
 
   /// 东方财富 API - 返回 UTF-8 JSON
@@ -171,6 +232,8 @@ class StockPriceService {
         return '116.$symbol';
       case StockMarket.us:
         return '105.${symbol.toUpperCase()}';
+      case StockMarket.fund:
+        return null; // 基金不走东财 API
     }
   }
 }

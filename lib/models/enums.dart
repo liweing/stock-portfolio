@@ -4,6 +4,7 @@ enum BrokerageType {
   tiger('老虎'),
   xueqiu('雪球'),
   aShareBroker('A股券商'),
+  alipay('支付宝'),
   other('其他');
 
   final String label;
@@ -22,7 +23,8 @@ enum StockMarket {
   sh('沪市', 'CNY', '¥'),
   sz('深市', 'CNY', '¥'),
   hk('港股', 'HKD', 'HK\$'),
-  us('美股', 'USD', '\$');
+  us('美股', 'USD', '\$'),
+  fund('基金', 'CNY', '¥');
 
   final String label;
   final String currency;
@@ -69,6 +71,11 @@ enum StockMarket {
         return 'hk';
       case StockMarket.us:
         return 'us';
+      case StockMarket.fund:
+        return 'fund';
     }
   }
+
+  /// 是否是基金
+  bool get isFund => this == StockMarket.fund;
 }
