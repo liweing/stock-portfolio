@@ -1,6 +1,11 @@
 {
   "cleanUrls": false,
   "trailingSlash": false,
+  "functions": {
+    "api/fund.js": {
+      "runtime": "@vercel/node@3"
+    }
+  },
   "rewrites": [
     { "source": "/", "destination": "/build/web/index.html" },
     { "source": "/:path((?!build/|api/).*)", "destination": "/build/web/:path" }
