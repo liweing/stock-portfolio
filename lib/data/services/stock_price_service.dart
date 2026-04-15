@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../../models/enums.dart';
 
@@ -62,7 +63,7 @@ class StockPriceService {
     if (secid == null) return null;
 
     final response = await _dio.get(
-      'https://push2.eastmoney.com/api/qt/stock/get',
+      'https://push2delay.eastmoney.com/api/qt/stock/get',
       queryParameters: {
         'secid': secid,
         // f59 是价格精度（小数位数），用于动态计算除数
@@ -70,17 +71,26 @@ class StockPriceService {
         'ut': 'fa5fd1943c7b386f172d6893dbbd1d0c',
       },
       options: Options(
-        headers: {
-          'User-Agent': 'Mozilla/5.0',
-          'Referer': 'https://quote.eastmoney.com',
-        },
+        // 强制按 JSON 解析（东财返回 text/plain，Dio 原生 HTTP 默认不会解析）
+        responseType: ResponseType.json,
       ),
     );
 
-    final data = response.data;
+    // 防御性处理：如果返回的是 String（某些平台/content-type 下），手动 decode
+    final raw = response.data;
+    Map<String, dynamic>? data;
+    if (raw is Map<String, dynamic>) {
+      data = raw;
+    } else if (raw is String) {
+      try {
+        data = jsonDecode(raw) as Map<String, dynamic>;
+      } catch (_) {
+        return null;
+      }
+    }
     if (data == null || data['data'] == null) return null;
 
-    final d = data['data'];
+    final d = data['data'] as Map<String, dynamic>;
     final name = d['f58'] as String? ?? '';
     final code = d['f57'] as String? ?? symbol;
     final rawPrice = d['f43'];
