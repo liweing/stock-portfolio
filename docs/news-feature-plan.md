@@ -409,4 +409,4 @@ class NewsFeedScreen extends ConsumerWidget { ... }
 - 已决定：**查询策略在云端实现**（Edge Function，非 SQL 非客户端）
 - 项目位置：`/Users/bytedance/cc/stock_portfolio/`
 - Supabase 项目：`zbxpmrvwybqqwbruskqr`
-- Vercel 部署：https://stock-portfolio-topaz.vercel.app/
+- Vercel 部署：https://stockportfolio.company/

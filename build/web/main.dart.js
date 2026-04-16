@@ -104542,7 +104542,7 @@ case 3:c=a1
 b=null
 p=5
 s=8
-return A.n(n.a.Qp("https://stock-portfolio-topaz.vercel.app/version.json?t="+Date.now(),A.aPy(B.dA,new A.awX()),t.z),$async$xe)
+return A.n(n.a.Qp("https://stockportfolio.company/version.json?t="+Date.now(),A.aPy(B.dA,new A.awX()),t.z),$async$xe)
 case 8:m=a1
 if(m.c===200&&t.f.b(m.a)){l=t.a.a(m.a)
 k=A.aF(l.i(0,"version"))

@@ -2,7 +2,7 @@
 // 通过 fetch 内部静态文件并强制 Content-Disposition: attachment 触发浏览器下载
 module.exports = async function handler(req, res) {
   const apkUrl =
-    'https://stock-portfolio-topaz.vercel.app/downloads/app-release.apk';
+    'https://stockportfolio.company/downloads/app-release.apk';
 
   try {
     const response = await fetch(apkUrl);

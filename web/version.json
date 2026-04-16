@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "build": 11,
-  "apkUrl": "https://stock-portfolio-topaz.vercel.app/downloads/app-release.apk",
-  "publishedAt": "2026-04-16T18:15:00Z",
-  "changelog": "## 新版本 1.0.0+11\n\n### 🐛 Bug 修复\n- 修复饼图点击后中心详情一闪即逝的问题\n- 现在：点击某块后选中状态持续显示，再次点击同一块取消，点其他块切换"
+  "build": 12,
+  "apkUrl": "https://stockportfolio.company/downloads/app-release.apk",
+  "publishedAt": "2026-04-16T19:00:00Z",
+  "changelog": "## 新版本 1.0.0+12\n\n### 🌐 启用新域名\n- 官方站点迁移到 stockportfolio.company\n- 原 vercel.app 域名继续可用\n- 版本检查 / APK 下载 / 介绍页 QR 全部指向新域名"
 }

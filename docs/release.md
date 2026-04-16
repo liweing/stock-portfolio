@@ -40,7 +40,7 @@ cp build/app/outputs/flutter-apk/app-release.apk build/web/downloads/app-release
 {
   "version": "1.1.0",
   "build": 3,
-  "apkUrl": "https://stock-portfolio-topaz.vercel.app/downloads/app-release.apk",
+  "apkUrl": "https://stockportfolio.company/downloads/app-release.apk",
   "publishedAt": "2026-05-01T00:00:00Z",
   "changelog": "## 新功能\n- xxx\n\n## Bug 修复\n- yyy"
 }
@@ -63,8 +63,8 @@ Vercel 自动部署（约 30 秒）。
 ## 6. 验证
 
 ```bash
-curl https://stock-portfolio-topaz.vercel.app/version.json
-curl -I https://stock-portfolio-topaz.vercel.app/downloads/app-release.apk
+curl https://stockportfolio.company/version.json
+curl -I https://stockportfolio.company/downloads/app-release.apk
 ```
 
 打开旧版 App：
@@ -101,7 +101,7 @@ cat > web/version.json <<EOF
 {
   "version": "${VERSION}",
   "build": ${BUILD},
-  "apkUrl": "https://stock-portfolio-topaz.vercel.app/downloads/app-release.apk",
+  "apkUrl": "https://stockportfolio.company/downloads/app-release.apk",
   "publishedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "changelog": ${CHANGELOG@Q}
 }

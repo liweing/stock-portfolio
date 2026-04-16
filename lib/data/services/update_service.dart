@@ -54,7 +54,7 @@ class UpdateCheckResult {
 class UpdateService {
   final Dio _dio;
   static const String _versionUrl =
-      'https://stock-portfolio-topaz.vercel.app/version.json';
+      'https://stockportfolio.company/version.json';
 
   UpdateService({Dio? dio}) : _dio = dio ?? Dio();
 
