@@ -8,7 +8,8 @@
   <meta property="og:title" content="持仓助手">
   <meta property="og:description" content="一款支持 A 股、港股、美股、基金的跨平台持仓管理工具">
   <title>持仓助手 — 看清你所有的投资</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="app-icon.png">
+  <link rel="apple-touch-icon" href="app-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -60,11 +61,13 @@
     .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
     .logo-mark {
       width: 32px; height: 32px;
-      background: linear-gradient(135deg, #6366f1, #ec4899);
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
+      background: white;
+      padding: 4px;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
     }
+    .logo-mark img { width: 100%; height: 100%; object-fit: contain; }
     .nav-links { display: flex; gap: 8px; }
     .nav-link {
       padding: 8px 14px; border-radius: 8px;
@@ -574,7 +577,7 @@
   <nav class="nav">
     <div class="nav-inner">
       <a href="#" class="logo">
-        <span class="logo-mark">📊</span>
+        <span class="logo-mark"><img src="app-icon.png" alt="持仓助手"></span>
         持仓助手
       </a>
       <div class="nav-links">
@@ -774,11 +777,11 @@
         <div class="dl-card">
           <div class="qr-wrap">
             <img alt="Scan QR to download Android APK"
-                 src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&ecc=H&data=https%3A%2F%2Fstock-portfolio-topaz.vercel.app%2Fd">
+                 src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&ecc=H&data=https%3A%2F%2Fstock-portfolio-topaz.vercel.app%2Fdownloads%2Fapp-release.apk">
           </div>
           <div class="dl-title">Android</div>
-          <div class="dl-sub">📲 扫码后点击「打开网址」开始下载</div>
-          <a href="/api/download-apk" download="stock-portfolio.apk" class="dl-action">或直接点击下载 ↓</a>
+          <div class="dl-sub">📲 手机扫码下载</div>
+          <a href="/downloads/app-release.apk" download="stock-portfolio.apk" class="dl-action">点击下载 ↓</a>
         </div>
 
         <!-- iOS -->
@@ -797,7 +800,7 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <div class="logo">
-          <span class="logo-mark">📊</span>
+          <span class="logo-mark"><img src="app-icon.png" alt="持仓助手"></span>
           持仓助手
         </div>
         <p class="footer-desc">
@@ -808,7 +811,7 @@
       <div class="footer-col">
         <h4>产品</h4>
         <a href="/">Web 版</a>
-        <a href="/api/download-apk" download="stock-portfolio.apk">Android 下载</a>
+        <a href="/downloads/app-release.apk" download="stock-portfolio.apk">Android 下载</a>
         <a href="#">iOS（Coming Soon）</a>
       </div>
       <div class="footer-col">
