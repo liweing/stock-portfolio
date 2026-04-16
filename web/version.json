@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "build": 5,
+  "build": 6,
   "apkUrl": "https://stock-portfolio-topaz.vercel.app/downloads/app-release.apk",
-  "publishedAt": "2026-04-16T16:00:00Z",
-  "changelog": "## 新版本 1.0.0+5\n\n### ✨ 新功能\n- 新增期货市场支持（郑商所/上期所/大商所/中金所）\n- 可添加 MA609、rb2610 等期货合约\n- 持仓单位自动识别：股 / 份 / 手\n\n### 🐛 Bug 修复\n- 检查更新功能正确识别 build 号变化\n\n### ⚠️ 如果是从 1.0.0+2 及之前版本升级\n由于签名升级，请先卸载旧版再安装。"
+  "publishedAt": "2026-04-16T16:15:00Z",
+  "changelog": "## 新版本 1.0.0+6\n\n### 🐛 Bug 修复\n- 修复期货合约（如 ma609）无法自动查询名称的问题：之前选择期货市场后，输入代码会被误识别为美股"
 }

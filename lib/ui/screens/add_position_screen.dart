@@ -65,8 +65,8 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
   void _onSymbolChanged() {
     if (widget.isEditing) return;
     final text = _symbolController.text.trim();
-    // 如果用户当前选的是"基金"，就不要自动推断为股票市场
-    if (!_selectedMarket.isFund) {
+    // 基金 / 期货都是用户手动指定的市场，不要让自动推断覆盖
+    if (!_selectedMarket.isFund && !_selectedMarket.isFutures) {
       final guess = StockMarket.guessFromSymbol(text);
       if (guess != null && guess != _selectedMarket) {
         setState(() => _selectedMarket = guess);
@@ -83,10 +83,15 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
   }
 
   Future<void> _lookupStockName(String symbol) async {
-    // 基金走基金 API，股票走股票 API
-    final market = _selectedMarket.isFund
-        ? StockMarket.fund
-        : (StockMarket.guessFromSymbol(symbol) ?? _selectedMarket);
+    // 基金/期货走对应 API；股票则用自动推断
+    final StockMarket market;
+    if (_selectedMarket.isFund) {
+      market = StockMarket.fund;
+    } else if (_selectedMarket.isFutures) {
+      market = StockMarket.futures;
+    } else {
+      market = StockMarket.guessFromSymbol(symbol) ?? _selectedMarket;
+    }
     setState(() => _isLookingUp = true);
     try {
       final priceService = ref.read(stockPriceServiceProvider);
