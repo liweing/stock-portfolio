@@ -30,63 +30,40 @@ void main() {
     });
 
     test('支持预发布标签（- 后视为同版本）', () {
-      // 1.0.0-beta 视为 1.0.0
       expect(UpdateService.compareVersions('1.0.0-beta', '1.0.0'), 0);
     });
   });
 
   group('ReleaseInfo.fromJson', () {
-    test('解析含 APK asset 的 release', () {
+    test('正常解析 version.json', () {
       final json = {
-        'tag_name': 'v1.2.0',
-        'name': '1.2.0 Release',
-        'body': '修复了一些 bug',
-        'html_url': 'https://github.com/foo/bar/releases/tag/v1.2.0',
-        'published_at': '2026-04-15T12:00:00Z',
-        'assets': [
-          {
-            'name': 'app-release.apk',
-            'browser_download_url':
-                'https://github.com/foo/bar/releases/download/v1.2.0/app-release.apk',
-          },
-        ],
+        'version': '1.2.0',
+        'build': 5,
+        'apkUrl': 'https://example.com/app.apk',
+        'changelog': '修复了一些 bug',
+        'publishedAt': '2026-04-15T12:00:00Z',
       };
       final r = ReleaseInfo.fromJson(json);
-      expect(r.tagName, 'v1.2.0');
       expect(r.version, '1.2.0');
+      expect(r.build, 5);
+      expect(r.apkUrl, 'https://example.com/app.apk');
       expect(r.body, '修复了一些 bug');
-      expect(r.apkDownloadUrl, contains('app-release.apk'));
+      expect(r.tagName, 'v1.2.0');
     });
 
-    test('无 APK 时 apkDownloadUrl 为 null', () {
-      final json = {
-        'tag_name': 'v1.0.0',
-        'name': '1.0.0',
-        'body': '',
-        'html_url': 'https://github.com/foo/bar/releases/tag/v1.0.0',
-        'published_at': '2026-04-15T12:00:00Z',
-        'assets': [],
-      };
+    test('缺失字段时使用默认值', () {
+      final json = {'version': '1.0.0'};
       final r = ReleaseInfo.fromJson(json);
-      expect(r.apkDownloadUrl, isNull);
+      expect(r.version, '1.0.0');
+      expect(r.build, 0);
+      expect(r.apkUrl, '');
+      expect(r.body, '');
     });
 
-    test('忽略非 APK 的 asset', () {
-      final json = {
-        'tag_name': 'v1.0.0',
-        'name': '1.0.0',
-        'body': '',
-        'html_url': 'https://github.com/foo/bar/releases/tag/v1.0.0',
-        'published_at': '2026-04-15T12:00:00Z',
-        'assets': [
-          {
-            'name': 'source.zip',
-            'browser_download_url': 'https://example.com/source.zip',
-          },
-        ],
-      };
+    test('build 字段支持 string 类型 number', () {
+      final json = {'version': '1.0.0', 'build': 10};
       final r = ReleaseInfo.fromJson(json);
-      expect(r.apkDownloadUrl, isNull);
+      expect(r.build, 10);
     });
   });
 }

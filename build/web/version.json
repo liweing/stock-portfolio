@@ -1,1 +1,7 @@
-{"app_name":"stock_portfolio","version":"1.0.0","build_number":"2","package_name":"stock_portfolio"}
+{
+  "version": "1.0.0",
+  "build": 2,
+  "apkUrl": "https://stock-portfolio-topaz.vercel.app/downloads/app-release.apk",
+  "publishedAt": "2026-04-16T13:00:00Z",
+  "changelog": "## 🎉 持仓助手 v1.0.0 首个公开版本\n\n### ✨ 核心功能\n- 跨平台聚合（富途/老虎/雪球/A股券商/支付宝）\n- 实时行情（A股/港股/美股/场外基金）\n- 多币种盈亏自动换算人民币\n- 饼图仓位分布、按平台明细\n- 邮箱注册 + 云端同步\n\n### 🎨 UI 体验\n- 持仓 / 分析 Tab 左右滑动切换\n- 分析页下拉刷新\n- 编辑页底部一键删除\n- 基金估值「估」徽章\n\n### 🔧 工程化\n- 80+ 自动化测试\n- App 内一键检查更新\n\n### ⚠️ 风险提示\n投资有风险，入市需谨慎。本工具仅提供数据聚合服务，不构成投资建议。"
+}

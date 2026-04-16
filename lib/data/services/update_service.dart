@@ -1,50 +1,45 @@
 import 'package:dio/dio.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-/// GitHub Releases 返回的版本信息
+/// 远端版本元数据（从 Vercel 上的 version.json 拉取）
 class ReleaseInfo {
-  final String tagName; // 如 "v1.2.0"
-  final String name; // 发布标题
-  final String body; // changelog markdown
-  final String htmlUrl; // GitHub release 页面
-  final String? apkDownloadUrl; // APK 直链下载
+  final String version; // 如 "1.0.0"
+  final int build;
+  final String apkUrl;
+  final String changelog;
   final DateTime publishedAt;
 
   ReleaseInfo({
-    required this.tagName,
-    required this.name,
-    required this.body,
-    required this.htmlUrl,
-    required this.apkDownloadUrl,
+    required this.version,
+    required this.build,
+    required this.apkUrl,
+    required this.changelog,
     required this.publishedAt,
   });
 
-  /// 去掉 v 前缀的纯版本号 "1.2.0"
-  String get version => tagName.startsWith('v') ? tagName.substring(1) : tagName;
+  /// 兼容字段（用于显示）
+  String get tagName => 'v$version';
+  String get name => 'v$version';
+  String get body => changelog;
+  String get htmlUrl => apkUrl;
+  String? get apkDownloadUrl => apkUrl;
 
-  factory ReleaseInfo.fromJson(Map<String, dynamic> json) {
-    final assets = (json['assets'] as List? ?? []).cast<Map>();
-    final apkAsset = assets
-        .where((a) => (a['name'] as String?)?.endsWith('.apk') ?? false)
-        .firstOrNull;
-    return ReleaseInfo(
-      tagName: json['tag_name'] as String,
-      name: json['name'] as String? ?? json['tag_name'] as String,
-      body: json['body'] as String? ?? '',
-      htmlUrl: json['html_url'] as String,
-      apkDownloadUrl: apkAsset?['browser_download_url'] as String?,
-      publishedAt:
-          DateTime.tryParse(json['published_at'] as String? ?? '') ??
-              DateTime.now(),
-    );
-  }
+  factory ReleaseInfo.fromJson(Map<String, dynamic> json) => ReleaseInfo(
+        version: json['version'] as String,
+        build: (json['build'] as num?)?.toInt() ?? 0,
+        apkUrl: json['apkUrl'] as String? ?? '',
+        changelog: json['changelog'] as String? ?? '',
+        publishedAt:
+            DateTime.tryParse(json['publishedAt'] as String? ?? '') ??
+                DateTime.now(),
+      );
 }
 
 /// 检查升级结果
 class UpdateCheckResult {
   final String currentVersion; // 本地版本（不带 v）
   final String currentBuild; // 本地 build number
-  final ReleaseInfo? latest; // GitHub 最新 release（无网/无发布时为 null）
+  final ReleaseInfo? latest;
   final bool hasUpdate;
 
   UpdateCheckResult({
@@ -58,7 +53,8 @@ class UpdateCheckResult {
 /// App 升级检查服务
 class UpdateService {
   final Dio _dio;
-  static const String _repo = 'liweing/stock-portfolio';
+  static const String _versionUrl =
+      'https://stock-portfolio-topaz.vercel.app/version.json';
 
   UpdateService({Dio? dio}) : _dio = dio ?? Dio();
 
@@ -68,18 +64,16 @@ class UpdateService {
     return (version: info.version, build: info.buildNumber);
   }
 
-  /// 检查 GitHub Releases 上是否有新版本
+  /// 检查 Vercel 上 version.json 是否有新版本
   Future<UpdateCheckResult> checkForUpdate() async {
     final local = await getLocalVersion();
 
     ReleaseInfo? latest;
     try {
       final response = await _dio.get(
-        'https://api.github.com/repos/$_repo/releases/latest',
+        '$_versionUrl?t=${DateTime.now().millisecondsSinceEpoch}',
         options: Options(
-          headers: {'Accept': 'application/vnd.github+json'},
           responseType: ResponseType.json,
-          // 防止 GitHub 的 404（无 release）抛异常
           validateStatus: (s) => s != null && s < 500,
         ),
       );
@@ -102,7 +96,6 @@ class UpdateService {
   }
 
   /// 语义化版本比较：返回 1 / 0 / -1
-  /// 1.2.0 > 1.1.9, 1.0.10 > 1.0.9
   static int compareVersions(String a, String b) {
     final pa = _parseVersion(a);
     final pb = _parseVersion(b);
