@@ -1,10 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../../core/constants.dart';
+import '../../core/utils.dart';
 import '../../models/portfolio_summary.dart';
 
-/// 仓位分配饼图
-class AllocationPieChart extends StatelessWidget {
+/// 仓位分配饼图（点击扇区可放大并显示详情）
+class AllocationPieChart extends StatefulWidget {
   final List<AllocationItem> items;
   final String title;
 
@@ -15,10 +16,18 @@ class AllocationPieChart extends StatelessWidget {
   });
 
   @override
+  State<AllocationPieChart> createState() => _AllocationPieChartState();
+}
+
+class _AllocationPieChartState extends State<AllocationPieChart> {
+  /// 当前选中的扇区索引（-1 表示未选中）
+  int _touchedIndex = -1;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    if (items.isEmpty) {
+    if (widget.items.isEmpty) {
       return const SizedBox(
         height: 200,
         child: Center(child: Text('暂无数据')),
@@ -30,26 +39,58 @@ class AllocationPieChart extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          child: Row(
+            children: [
+              Text(
+                widget.title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '点击扇区查看详情',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ),
         ),
         SizedBox(
-          height: 220,
+          height: 240,
           child: Row(
             children: [
-              // 饼图
+              // 饼图（含中心标签）
               Expanded(
                 flex: 3,
-                child: PieChart(
-                  PieChartData(
-                    sections: _buildSections(),
-                    centerSpaceRadius: 36,
-                    sectionsSpace: 2,
-                  ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    PieChart(
+                      PieChartData(
+                        sections: _buildSections(),
+                        centerSpaceRadius: 50,
+                        sectionsSpace: 2,
+                        pieTouchData: PieTouchData(
+                          touchCallback: (event, response) {
+                            setState(() {
+                              if (!event.isInterestedForInteractions ||
+                                  response == null ||
+                                  response.touchedSection == null) {
+                                _touchedIndex = -1;
+                                return;
+                              }
+                              _touchedIndex =
+                                  response.touchedSection!.touchedSectionIndex;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    // 中心展示选中扇区的详细信息
+                    _buildCenterLabel(theme),
+                  ],
                 ),
               ),
               // 图例
@@ -71,50 +112,113 @@ class AllocationPieChart extends StatelessWidget {
   }
 
   List<PieChartSectionData> _buildSections() {
-    return items.asMap().entries.map((entry) {
+    return widget.items.asMap().entries.map((entry) {
       final index = entry.key;
       final item = entry.value;
+      final isTouched = index == _touchedIndex;
+      // 选中扇区放大 + 字号变大 + 加阴影
+      final radius = isTouched ? 64.0 : 50.0;
+      final fontSize = isTouched ? 13.0 : 11.0;
+
       return PieChartSectionData(
         color: ChartColors.getColor(index),
         value: item.value,
         title: '${item.percentage.toStringAsFixed(1)}%',
-        radius: 52,
-        titleStyle: const TextStyle(
-          fontSize: 11,
+        radius: radius,
+        titleStyle: TextStyle(
+          fontSize: fontSize,
           fontWeight: FontWeight.bold,
           color: Colors.white,
+          shadows: const [Shadow(color: Colors.black45, blurRadius: 2)],
         ),
         titlePositionPercentageOffset: 0.6,
       );
     }).toList();
   }
 
+  /// 中心区域：未选中显示提示，选中显示该扇区的详情
+  Widget _buildCenterLabel(ThemeData theme) {
+    if (_touchedIndex < 0 || _touchedIndex >= widget.items.length) {
+      return const SizedBox.shrink();
+    }
+    final item = widget.items[_touchedIndex];
+    final color = ChartColors.getColor(_touchedIndex);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      constraints: const BoxConstraints(maxWidth: 100),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            item.label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            '¥${FormatUtil.formatAmount(item.value)}',
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+            maxLines: 1,
+          ),
+          Text(
+            '${item.percentage.toStringAsFixed(1)}%',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   List<Widget> _buildLegend(ThemeData theme) {
-    return items.asMap().entries.map((entry) {
+    return widget.items.asMap().entries.map((entry) {
       final index = entry.key;
       final item = entry.value;
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 3),
-        child: Row(
-          children: [
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                color: ChartColors.getColor(index),
-                shape: BoxShape.circle,
+      final isSelected = index == _touchedIndex;
+      return InkWell(
+        onTap: () => setState(() {
+          _touchedIndex = isSelected ? -1 : index;
+        }),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? ChartColors.getColor(index).withValues(alpha: 0.15)
+                : null,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: ChartColors.getColor(index),
+                  shape: BoxShape.circle,
+                ),
               ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                item.label,
-                style: theme.textTheme.bodySmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  item.label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }).toList();
