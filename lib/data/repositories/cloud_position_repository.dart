@@ -11,6 +11,7 @@ class CloudPosition {
   final double avgCost;
   final String platform;
   final String currency;
+  final String direction; // 'long' / 'short'
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -23,6 +24,7 @@ class CloudPosition {
     required this.avgCost,
     required this.platform,
     required this.currency,
+    required this.direction,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -36,6 +38,7 @@ class CloudPosition {
         avgCost: (json['avg_cost'] as num).toDouble(),
         platform: json['platform'] as String,
         currency: json['currency'] as String? ?? 'CNY',
+        direction: json['direction'] as String? ?? 'long',
         createdAt: DateTime.parse(json['created_at'] as String),
         updatedAt: DateTime.parse(json['updated_at'] as String),
       );
@@ -87,6 +90,7 @@ class CloudPositionRepository {
     required double quantity,
     required double avgCost,
     required BrokerageType platform,
+    PositionDirection direction = PositionDirection.long,
   }) async {
     final userId = _userId;
     if (userId == null) throw Exception('未登录');
@@ -99,6 +103,7 @@ class CloudPositionRepository {
       'avg_cost': avgCost,
       'platform': platform.name,
       'currency': market.currency,
+      'direction': direction.name,
     });
   }
 
@@ -111,6 +116,7 @@ class CloudPositionRepository {
     required double quantity,
     required double avgCost,
     required BrokerageType platform,
+    PositionDirection direction = PositionDirection.long,
   }) async {
     final userId = _userId;
     if (userId == null) throw Exception('未登录');
@@ -122,6 +128,7 @@ class CloudPositionRepository {
       'avg_cost': avgCost,
       'platform': platform.name,
       'currency': market.currency,
+      'direction': direction.name,
       'updated_at': DateTime.now().toIso8601String(),
     }).eq('id', id).eq('user_id', userId);
   }

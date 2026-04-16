@@ -28,13 +28,43 @@ class PositionTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    pnl.name,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    children: [
+                      // 做空徽章
+                      if (pnl.isShort) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade700.withValues(alpha: 0.15),
+                            border: Border.all(
+                              color: Colors.green.shade700,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '空',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: Colors.green.shade700,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                      ],
+                      Flexible(
+                        child: Text(
+                          pnl.name,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 2),
                   Row(
@@ -117,12 +147,12 @@ class PositionTile extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    '持仓 ${FormatUtil.formatInt(pnl.quantity)} 股',
+                    _quantityLabel(pnl),
                     style: theme.textTheme.bodySmall,
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    '成本 ${pnl.currencySymbol}${FormatUtil.formatAmount(pnl.avgCost)}',
+                    '${pnl.isShort ? "开仓" : "成本"} ${pnl.currencySymbol}${FormatUtil.formatAmount(pnl.avgCost)}',
                     style: theme.textTheme.bodySmall,
                   ),
                 ],
@@ -149,5 +179,16 @@ class PositionTile extends StatelessWidget {
           ),
         ),
       );
+  }
+
+  String _quantityLabel(PositionPnl p) {
+    final qty = FormatUtil.formatInt(p.quantity);
+    final unit = p.market.isFund
+        ? '份'
+        : p.market.isFutures
+            ? '手'
+            : '股';
+    final action = p.isShort ? '卖空' : '持仓';
+    return '$action $qty $unit';
   }
 }

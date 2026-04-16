@@ -31,6 +31,7 @@ final positionPnlListProvider = Provider<List<PositionPnl>>((ref) {
       currentPrice: currentPrice,
       prevClose: prevClose,
       currency: pos.currency,
+      direction: PositionDirection.fromName(pos.direction),
     );
   }).toList();
 });

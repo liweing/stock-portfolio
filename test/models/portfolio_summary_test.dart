@@ -9,6 +9,7 @@ PositionPnl _p({
   double prev = 100,
   StockMarket market = StockMarket.sh,
   String currency = 'CNY',
+  PositionDirection direction = PositionDirection.long,
 }) =>
     PositionPnl(
       positionId: 1,
@@ -21,6 +22,7 @@ PositionPnl _p({
       currentPrice: price,
       prevClose: prev,
       currency: currency,
+      direction: direction,
     );
 
 void main() {
@@ -163,6 +165,69 @@ void main() {
         _p(market: StockMarket.fund).currencySymbol,
         '¥',
       );
+    });
+  });
+
+  group('做空盈亏', () {
+    test('做空且价格下跌 → 盈利', () {
+      // 开仓 800（做空）, 现价 750, 量 10手 → 赚 (800-750)*10 = 500
+      final p = _p(
+        cost: 800, price: 750, qty: 10, prev: 760,
+        market: StockMarket.futures,
+        direction: PositionDirection.short,
+      );
+      expect(p.pnl, 500);
+      expect(p.isProfit, isTrue);
+      expect(p.isShort, isTrue);
+    });
+
+    test('做空且价格上涨 → 亏损', () {
+      final p = _p(
+        cost: 800, price: 850, qty: 10, prev: 840,
+        market: StockMarket.futures,
+        direction: PositionDirection.short,
+      );
+      expect(p.pnl, -500);
+      expect(p.isProfit, isFalse);
+    });
+
+    test('做空今日盈亏 = (昨收 - 现价) × 数量', () {
+      // 昨收 760, 现价 750（跌了），做空赚 100
+      final p = _p(
+        cost: 800, price: 750, qty: 10, prev: 760,
+        market: StockMarket.futures,
+        direction: PositionDirection.short,
+      );
+      expect(p.dailyPnl, 100);
+      expect(p.isDailyUp, isTrue);
+    });
+
+    test('做空今日涨跌幅按方向反转', () {
+      // 价格涨了 1.32%（750→760），做空亏 1.32%
+      final p = _p(
+        cost: 800, price: 760, qty: 10, prev: 750,
+        market: StockMarket.futures,
+        direction: PositionDirection.short,
+      );
+      expect(p.dailyChangePercent, closeTo(-1.333, 0.01));
+    });
+
+    test('做空成本 = 名义市值（同做多公式）', () {
+      final p = _p(
+        cost: 800, price: 850, qty: 10,
+        direction: PositionDirection.short,
+      );
+      expect(p.costValue, 8000);
+      expect(p.marketValue, 8500); // 名义价值（不是真实持仓）
+    });
+
+    test('做空收益率', () {
+      // 开仓 800, 现价 720（跌 10%）, 做空盈利 10%
+      final p = _p(
+        cost: 800, price: 720, qty: 10,
+        direction: PositionDirection.short,
+      );
+      expect(p.pnlPercent, closeTo(10, 0.001));
     });
   });
 

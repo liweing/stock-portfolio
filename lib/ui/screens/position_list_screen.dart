@@ -240,6 +240,7 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
           initialQuantity: pnl.quantity,
           initialAvgCost: pnl.avgCost,
           initialPlatform: pnl.platform,
+          initialDirection: pnl.direction,
         ),
       ),
     );

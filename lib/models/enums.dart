@@ -85,4 +85,28 @@ enum StockMarket {
 
   /// 是否是期货
   bool get isFutures => this == StockMarket.futures;
+
+  /// 是否支持做空（仅期货）
+  bool get supportsShort => this == StockMarket.futures;
+}
+
+/// 交易方向（仅期货使用，其他默认 long）
+enum PositionDirection {
+  long('做多', '多'),
+  short('做空', '空');
+
+  final String label;
+  final String shortLabel;
+  const PositionDirection(this.label, this.shortLabel);
+
+  bool get isLong => this == PositionDirection.long;
+  bool get isShort => this == PositionDirection.short;
+
+  static PositionDirection fromName(String? name) {
+    if (name == null) return PositionDirection.long;
+    return PositionDirection.values.firstWhere(
+      (e) => e.name == name,
+      orElse: () => PositionDirection.long,
+    );
+  }
 }

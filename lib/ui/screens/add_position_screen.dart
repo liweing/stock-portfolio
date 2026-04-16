@@ -14,6 +14,7 @@ class AddPositionScreen extends ConsumerStatefulWidget {
   final double? initialQuantity;
   final double? initialAvgCost;
   final BrokerageType? initialPlatform;
+  final PositionDirection? initialDirection;
 
   const AddPositionScreen({
     super.key,
@@ -24,6 +25,7 @@ class AddPositionScreen extends ConsumerStatefulWidget {
     this.initialQuantity,
     this.initialAvgCost,
     this.initialPlatform,
+    this.initialDirection,
   });
 
   bool get isEditing => editPositionId != null;
@@ -40,6 +42,7 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
   late final TextEditingController _costController;
   late StockMarket _selectedMarket;
   late BrokerageType _selectedPlatform;
+  late PositionDirection _selectedDirection;
   bool _isSaving = false;
   bool _isDeleting = false;
   bool _isLookingUp = false;
@@ -57,6 +60,7 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
         text: widget.initialAvgCost?.toString() ?? '');
     _selectedMarket = widget.initialMarket ?? StockMarket.sh;
     _selectedPlatform = widget.initialPlatform ?? BrokerageType.futu;
+    _selectedDirection = widget.initialDirection ?? PositionDirection.long;
 
     // 监听代码输入，自动推断市场
     _symbolController.addListener(_onSymbolChanged);
@@ -152,7 +156,13 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
             MarketSelector(
               selected: _selectedMarket,
               onChanged: (v) {
-                setState(() => _selectedMarket = v);
+                setState(() {
+                  _selectedMarket = v;
+                  // 切到不支持做空的市场时，强制重置为做多
+                  if (!v.supportsShort) {
+                    _selectedDirection = PositionDirection.long;
+                  }
+                });
                 // 切换市场后，如果有代码就重新查一次名称
                 final symbol = _symbolController.text.trim();
                 if (symbol.isNotEmpty && !widget.isEditing) {
@@ -165,6 +175,31 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
                 }
               },
             ),
+
+            // 交易方向（仅期货市场显示）
+            if (_selectedMarket.supportsShort) ...[
+              const SizedBox(height: 20),
+              Text('交易方向',
+                  style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 8),
+              SegmentedButton<PositionDirection>(
+                segments: PositionDirection.values
+                    .map((d) => ButtonSegment(
+                          value: d,
+                          label: Text(d.label),
+                          icon: Icon(
+                            d.isLong
+                                ? Icons.trending_up
+                                : Icons.trending_down,
+                            size: 18,
+                          ),
+                        ))
+                    .toList(),
+                selected: {_selectedDirection},
+                onSelectionChanged: (set) =>
+                    setState(() => _selectedDirection = set.first),
+              ),
+            ],
 
             const SizedBox(height: 20),
 
@@ -409,6 +444,7 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
           quantity: quantity,
           avgCost: avgCost,
           platform: _selectedPlatform,
+          direction: _selectedDirection,
         );
       } else {
         // 新增
@@ -419,6 +455,7 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
           quantity: quantity,
           avgCost: avgCost,
           platform: _selectedPlatform,
+          direction: _selectedDirection,
         );
       }
 

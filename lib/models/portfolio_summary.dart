@@ -33,6 +33,7 @@ class PositionPnl {
   final double currentPrice;
   final double prevClose;
   final String currency;
+  final PositionDirection direction;
 
   PositionPnl({
     required this.positionId,
@@ -45,36 +46,48 @@ class PositionPnl {
     required this.currentPrice,
     required this.prevClose,
     required this.currency,
+    this.direction = PositionDirection.long,
   });
 
-  /// 今日盈亏 = (当前价 - 昨收) × 数量
-  double get dailyPnl =>
-      prevClose > 0 ? (currentPrice - prevClose) * quantity : 0;
+  /// 方向系数：做多 +1，做空 -1
+  double get _directionMultiplier => direction.isLong ? 1.0 : -1.0;
 
-  /// 今日涨跌幅
-  double get dailyChangePercent =>
-      prevClose > 0 ? ((currentPrice - prevClose) / prevClose) * 100 : 0;
+  /// 今日盈亏 = (当前价 - 昨收) × 数量 × 方向
+  double get dailyPnl => prevClose > 0
+      ? (currentPrice - prevClose) * quantity * _directionMultiplier
+      : 0;
+
+  /// 我的今日涨跌幅（按方向，做空时反转）
+  double get dailyChangePercent => prevClose > 0
+      ? ((currentPrice - prevClose) / prevClose) * 100 * _directionMultiplier
+      : 0;
 
   /// 今日盈亏（人民币）
   double get dailyPnlCny => ExchangeRate.toCny(dailyPnl, currency);
 
-  /// 今日是否上涨
+  /// 今日是否上涨（赚钱）
   bool get isDailyUp => dailyPnl >= 0;
 
-  /// 成本金额
+  /// 成本金额（开仓占用资金，永远正数）
   double get costValue => quantity * avgCost;
 
-  /// 市值
+  /// 市值（名义价值，按现价计算，永远正数；做空时也算正"名义"）
   double get marketValue => quantity * currentPrice;
 
-  /// 盈亏金额
-  double get pnl => marketValue - costValue;
+  /// 累计盈亏（考虑方向）
+  /// 做多: (现价 - 成本) × 数量
+  /// 做空: (成本 - 现价) × 数量
+  double get pnl =>
+      (currentPrice - avgCost) * quantity * _directionMultiplier;
 
-  /// 盈亏百分比
+  /// 盈亏百分比（按成本算）
   double get pnlPercent => costValue == 0 ? 0 : (pnl / costValue) * 100;
 
   /// 是否盈利
   bool get isProfit => pnl >= 0;
+
+  /// 是否是做空持仓
+  bool get isShort => direction.isShort;
 
   /// 基金的当前价是估算净值（gsz ≠ dwjz）
   bool get isEstimated =>
