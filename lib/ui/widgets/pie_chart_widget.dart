@@ -74,15 +74,23 @@ class _AllocationPieChartState extends State<AllocationPieChart> {
                         sectionsSpace: 2,
                         pieTouchData: PieTouchData(
                           touchCallback: (event, response) {
+                            // 只响应真正的点击确认事件：
+                            // FlTapUpEvent（抬手结束点击）或 FlPanEndEvent（拖动结束）
+                            // 忽略 hover / down 等中间事件，选中状态保持
+                            final isConfirmTap =
+                                event is FlTapUpEvent ||
+                                event is FlPanEndEvent ||
+                                event is FlLongPressEnd;
+                            if (!isConfirmTap) return;
+
+                            final idx =
+                                response?.touchedSection?.touchedSectionIndex;
+                            if (idx == null || idx < 0) return;
+
                             setState(() {
-                              if (!event.isInterestedForInteractions ||
-                                  response == null ||
-                                  response.touchedSection == null) {
-                                _touchedIndex = -1;
-                                return;
-                              }
+                              // 再次点同一块则取消，否则切换到新块
                               _touchedIndex =
-                                  response.touchedSection!.touchedSectionIndex;
+                                  _touchedIndex == idx ? -1 : idx;
                             });
                           },
                         ),
