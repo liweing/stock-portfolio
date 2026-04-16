@@ -263,11 +263,93 @@
     }
     footer a:hover { color: #90caf9; }
 
+    /* QR 下载卡 */
+    .download-card {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 22px;
+      min-width: 200px;
+      background: white;
+      color: #0d47a1;
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      transition: all 0.2s;
+    }
+    .download-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .download-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .qr-code {
+      width: 150px;
+      height: 150px;
+      background: white;
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow: inset 0 0 0 1px #eee;
+    }
+    .qr-code img { width: 100%; height: 100%; display: block; }
+    .download-card-hint {
+      font-size: 12px;
+      color: #555;
+      margin-top: 10px;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .download-card-link {
+      color: #1565c0;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      margin-top: 6px;
+      display: inline-block;
+    }
+    .download-card-link:hover { text-decoration: underline; }
+
+    /* iOS coming soon card */
+    .download-card.disabled {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.85);
+      box-shadow: none;
+      border: 1px dashed rgba(255,255,255,0.3);
+      cursor: not-allowed;
+    }
+    .download-card.disabled .qr-placeholder {
+      width: 150px;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px dashed rgba(255,255,255,0.25);
+      border-radius: 8px;
+      font-size: 36px;
+    }
+    .download-card.disabled .download-card-hint {
+      color: #ffd54f;
+      font-weight: 600;
+    }
+
+    /* 让卡片排列时更平衡 */
+    .downloads {
+      align-items: stretch;
+    }
+
     @media (max-width: 600px) {
       .hero { padding: 60px 20px 80px; }
       section { padding: 60px 20px; }
       .btn { min-width: 140px; padding: 14px 20px; }
       .btn-icon { font-size: 24px; }
+      .download-card { min-width: 0; width: 100%; max-width: 280px; }
+      .qr-code, .qr-placeholder { width: 130px !important; height: 130px !important; }
     }
   </style>
 </head>
@@ -283,23 +365,32 @@
     </p>
 
     <div class="downloads">
+      <!-- Web 入口 -->
       <a href="/" class="btn btn-primary">
         <span class="btn-icon">🌐</span>
         <span class="btn-label">立即试用</span>
         <span class="btn-sub">浏览器打开</span>
       </a>
 
-      <a href="https://github.com/liweing/stock-portfolio/releases/latest" class="btn btn-secondary">
-        <span class="btn-icon">📱</span>
-        <span class="btn-label">下载 Android</span>
-        <span class="btn-sub">最新 APK</span>
-      </a>
+      <!-- Android：QR 码扫码下载 -->
+      <div class="download-card">
+        <div class="download-card-title">📱 Android</div>
+        <div class="qr-code">
+          <img id="qr-android-hero" alt="Scan to download APK"
+               src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=https%3A%2F%2Fgithub.com%2Fliweing%2Fstock-portfolio%2Freleases%2Flatest%2Fdownload%2Fapp-release.apk">
+        </div>
+        <div class="download-card-hint">📲 手机扫码直接下载</div>
+        <a href="https://github.com/liweing/stock-portfolio/releases/latest/download/app-release.apk"
+           class="download-card-link">或点这里下载 ↓</a>
+      </div>
 
-      <button class="btn btn-disabled" disabled>
-        <span class="btn-icon"></span>
-        <span class="btn-label">iOS</span>
-        <span class="btn-sub">Coming Soon</span>
-      </button>
+      <!-- iOS Coming Soon -->
+      <div class="download-card disabled">
+        <div class="download-card-title"> iOS</div>
+        <div class="qr-placeholder">⏳</div>
+        <div class="download-card-hint">Coming Soon</div>
+        <span class="download-card-link" style="color: rgba(255,255,255,0.5); cursor: not-allowed;">敬请期待</span>
+      </div>
     </div>
   </header>
 
@@ -434,11 +525,14 @@
         <span class="btn-label">立即试用</span>
         <span class="btn-sub">无需安装</span>
       </a>
-      <a href="https://github.com/liweing/stock-portfolio/releases/latest" class="btn btn-secondary">
-        <span class="btn-icon">⬇</span>
-        <span class="btn-label">下载 Android</span>
-        <span class="btn-sub">免费</span>
-      </a>
+      <div class="download-card">
+        <div class="download-card-title">📱 Android</div>
+        <div class="qr-code">
+          <img alt="Scan to download APK"
+               src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=https%3A%2F%2Fgithub.com%2Fliweing%2Fstock-portfolio%2Freleases%2Flatest%2Fdownload%2Fapp-release.apk">
+        </div>
+        <div class="download-card-hint">扫码下载 · 免费</div>
+      </div>
     </div>
   </section>
 
