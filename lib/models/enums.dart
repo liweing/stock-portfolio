@@ -24,7 +24,8 @@ enum StockMarket {
   sz('深市', 'CNY', '¥'),
   hk('港股', 'HKD', 'HK\$'),
   us('美股', 'USD', '\$'),
-  fund('基金', 'CNY', '¥');
+  fund('基金', 'CNY', '¥'),
+  futures('期货', 'CNY', '¥');
 
   final String label;
   final String currency;
@@ -73,9 +74,14 @@ enum StockMarket {
         return 'us';
       case StockMarket.fund:
         return 'fund';
+      case StockMarket.futures:
+        return 'futures';
     }
   }
 
   /// 是否是基金
   bool get isFund => this == StockMarket.fund;
+
+  /// 是否是期货
+  bool get isFutures => this == StockMarket.futures;
 }

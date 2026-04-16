@@ -120,6 +120,19 @@ class StockPriceService {
   /// 字段: f43=最高,f44=最低,f46=开盘,f58=名称,f170=涨跌幅,f60=昨收,f43=现价
   Future<StockQuote?> _fetchFromEastMoney(
       String symbol, StockMarket market) async {
+    // 期货：依次尝试各交易所前缀
+    if (market == StockMarket.futures) {
+      // 115=郑商所, 113=上期所, 114=大商所, 8=中金所, 142=能交所
+      for (final prefix in ['115', '113', '114', '8', '142']) {
+        final quote = await _queryEastMoneyWithSecid(
+          '$prefix.$symbol',
+          market,
+        );
+        if (quote != null) return quote;
+      }
+      return null;
+    }
+
     // 优先用推断的 market 查询
     final quote = await _queryEastMoney(symbol, market);
     if (quote != null) return quote;
@@ -138,6 +151,12 @@ class StockPriceService {
       String symbol, StockMarket market) async {
     final secid = _toEastMoneySecId(symbol, market);
     if (secid == null) return null;
+    return _queryEastMoneyWithSecid(secid, market);
+  }
+
+  /// 用指定 secid 查询（供期货多交易所尝试使用）
+  Future<StockQuote?> _queryEastMoneyWithSecid(
+      String secid, StockMarket market) async {
 
     final response = await _dio.get(
       'https://push2delay.eastmoney.com/api/qt/stock/get',
@@ -169,7 +188,9 @@ class StockPriceService {
 
     final d = data['data'] as Map<String, dynamic>;
     final name = d['f58'] as String? ?? '';
-    final code = d['f57'] as String? ?? symbol;
+    // 从 f57 或 secid 后缀拿到原始代码
+    final code = d['f57'] as String? ??
+        (secid.contains('.') ? secid.split('.').last : secid);
     final rawPrice = d['f43'];
     final rawPrevClose = d['f60'];
     final rawChangePct = d['f170'];
@@ -234,6 +255,8 @@ class StockPriceService {
         return '105.${symbol.toUpperCase()}';
       case StockMarket.fund:
         return null; // 基金不走东财 API
+      case StockMarket.futures:
+        return null; // 期货在 _fetchFromEastMoney 里直接尝试多个 secid
     }
   }
 }
