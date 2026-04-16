@@ -1,7 +1,7 @@
 name: stock_portfolio
 description: "持仓管家 - 多平台股票仓位聚合分析"
 publish_to: 'none'
-version: 1.0.0+7
+version: 1.0.0+8
 
 environment:
   sdk: ^3.11.4
@@ -38,6 +38,7 @@ dependencies:
   # App version + 升级检查
   package_info_plus: ^8.1.1
   url_launcher: ^6.3.1
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:

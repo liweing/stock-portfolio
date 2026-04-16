@@ -1,15 +1,18 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../widgets/update_checker.dart';
 import 'position_list_screen.dart';
 import 'analysis_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
   final _pageController = PageController();
 
@@ -17,6 +20,19 @@ class _HomeScreenState extends State<HomeScreen> {
     PositionListScreen(),
     AnalysisScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Web 端不需要升级检查（每次刷新都是最新）
+    if (!kIsWeb) {
+      // 延迟 2s 静默检查，避免阻塞首屏渲染
+      Future.delayed(const Duration(seconds: 2), () {
+        if (!mounted) return;
+        checkForUpdateWithDialog(context, ref, manual: false);
+      });
+    }
+  }
 
   @override
   void dispose() {

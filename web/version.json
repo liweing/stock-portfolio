@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "build": 7,
+  "build": 8,
   "apkUrl": "https://stock-portfolio-topaz.vercel.app/downloads/app-release.apk",
-  "publishedAt": "2026-04-16T16:30:00Z",
-  "changelog": "## 新版本 1.0.0+7\n\n### ✨ 改进\n- 市场选择器改用自适应布局，6 个选项不再换行挤字\n- 新增「期货平台」作为券商平台选项"
+  "publishedAt": "2026-04-16T16:50:00Z",
+  "changelog": "## 新版本 1.0.0+8\n\n### ✨ 新功能\n- 启动时自动后台检查更新\n- 用户点「稍后」会跳过该版本，不重复打扰；下个版本发布会重新提示\n\n### 🔧 重构\n- 升级检查逻辑抽出共用，启动检查 + 手动检查走同一套"
 }
