@@ -3,7 +3,8 @@
   "trailingSlash": false,
   "rewrites": [
     { "source": "/", "destination": "/build/web/index.html" },
-    { "source": "/:path((?!build/|api/).*)", "destination": "/build/web/:path" }
+    { "source": "/d", "destination": "/api/download-apk" },
+    { "source": "/:path((?!build/|api/|d$).*)", "destination": "/build/web/:path" }
   ],
   "headers": [
     {
