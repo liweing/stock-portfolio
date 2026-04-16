@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "build": 6,
+  "build": 7,
   "apkUrl": "https://stock-portfolio-topaz.vercel.app/downloads/app-release.apk",
-  "publishedAt": "2026-04-16T16:15:00Z",
-  "changelog": "## 新版本 1.0.0+6\n\n### 🐛 Bug 修复\n- 修复期货合约（如 ma609）无法自动查询名称的问题：之前选择期货市场后，输入代码会被误识别为美股"
+  "publishedAt": "2026-04-16T16:30:00Z",
+  "changelog": "## 新版本 1.0.0+7\n\n### ✨ 改进\n- 市场选择器改用自适应布局，6 个选项不再换行挤字\n- 新增「期货平台」作为券商平台选项"
 }

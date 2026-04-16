@@ -41,15 +41,17 @@ class MarketSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SegmentedButton<StockMarket>(
-      segments: StockMarket.values.map((market) {
-        return ButtonSegment<StockMarket>(
-          value: market,
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: StockMarket.values.map((market) {
+        final isSelected = market == selected;
+        return ChoiceChip(
           label: Text(market.label),
+          selected: isSelected,
+          onSelected: (_) => onChanged(market),
         );
       }).toList(),
-      selected: {selected},
-      onSelectionChanged: (set) => onChanged(set.first),
     );
   }
 }

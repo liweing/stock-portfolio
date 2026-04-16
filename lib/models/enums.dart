@@ -5,6 +5,7 @@ enum BrokerageType {
   xueqiu('雪球'),
   aShareBroker('A股券商'),
   alipay('支付宝'),
+  futures('期货平台'),
   other('其他');
 
   final String label;
