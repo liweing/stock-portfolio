@@ -126,6 +126,7 @@ class StockPriceService {
       for (final prefix in ['115', '113', '114', '8', '142']) {
         final quote = await _queryEastMoneyWithSecid(
           '$prefix.$symbol',
+          symbol,
           market,
         );
         if (quote != null) return quote;
@@ -151,12 +152,14 @@ class StockPriceService {
       String symbol, StockMarket market) async {
     final secid = _toEastMoneySecId(symbol, market);
     if (secid == null) return null;
-    return _queryEastMoneyWithSecid(secid, market);
+    return _queryEastMoneyWithSecid(secid, symbol, market);
   }
 
   /// 用指定 secid 查询（供期货多交易所尝试使用）
+  /// [originalSymbol] 是用户输入的原始 symbol，用作返回 quote 的 key
+  /// （API 的 f57 字段大小写不一致，会导致缓存查找 miss）
   Future<StockQuote?> _queryEastMoneyWithSecid(
-      String secid, StockMarket market) async {
+      String secid, String originalSymbol, StockMarket market) async {
 
     final response = await _dio.get(
       'https://push2delay.eastmoney.com/api/qt/stock/get',
@@ -188,9 +191,9 @@ class StockPriceService {
 
     final d = data['data'] as Map<String, dynamic>;
     final name = d['f58'] as String? ?? '';
-    // 从 f57 或 secid 后缀拿到原始代码
-    final code = d['f57'] as String? ??
-        (secid.contains('.') ? secid.split('.').last : secid);
+    // 始终用用户输入的原始 symbol（保持大小写一致），避免 API 返回的 f57 大小写差异
+    // 导致 PriceCache 写入键 vs Position symbol 查询键不匹配
+    final code = originalSymbol;
     final rawPrice = d['f43'];
     final rawPrevClose = d['f60'];
     final rawChangePct = d['f170'];

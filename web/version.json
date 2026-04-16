@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "build": 8,
+  "build": 9,
   "apkUrl": "https://stock-portfolio-topaz.vercel.app/downloads/app-release.apk",
-  "publishedAt": "2026-04-16T16:50:00Z",
-  "changelog": "## 新版本 1.0.0+8\n\n### ✨ 新功能\n- 启动时自动后台检查更新\n- 用户点「稍后」会跳过该版本，不重复打扰；下个版本发布会重新提示\n\n### 🔧 重构\n- 升级检查逻辑抽出共用，启动检查 + 手动检查走同一套"
+  "publishedAt": "2026-04-16T17:30:00Z",
+  "changelog": "## 新版本 1.0.0+9\n\n### 🐛 Bug 修复\n- 修复期货合约（如 i2609 铁矿石）今日涨跌幅显示为 0 的问题\n  原因：东财 API 返回的代码大小写与本地存储不一致，导致价格缓存查找失败\n\n### 🎨 介绍页\n- 进一步美化首页\n- 手机 mockup 改为完全镜像真实 App 分析页\n- 新增「使用流程」三步引导"
 }
