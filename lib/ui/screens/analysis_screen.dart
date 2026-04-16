@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils.dart';
+import '../../data/repositories/stock_repository.dart';
 import '../../models/portfolio_summary.dart';
+import '../../providers/database_provider.dart';
 import '../../providers/portfolio_providers.dart';
 import '../widgets/pie_chart_widget.dart';
 import '../widgets/pnl_card.dart';
@@ -15,6 +17,31 @@ class AnalysisScreen extends ConsumerStatefulWidget {
 
 class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
   bool _showByPlatform = false;
+  bool _isRefreshing = false;
+
+  Future<void> _refreshPrices() async {
+    if (_isRefreshing) return;
+    setState(() => _isRefreshing = true);
+    try {
+      final positions =
+          await ref.read(positionRepositoryProvider).getAll();
+      if (positions.isNotEmpty) {
+        final inputs = positions
+            .map((p) =>
+                PriceRefreshInput(symbol: p.symbol, market: p.market))
+            .toList();
+        await ref.read(stockRepositoryProvider).refreshPrices(inputs);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('行情刷新失败: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isRefreshing = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +51,24 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('投资分析'),
+        actions: [
+          IconButton(
+            icon: _isRefreshing
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.refresh),
+            onPressed: _isRefreshing ? null : _refreshPrices,
+          ),
+        ],
       ),
       body: summary.isEmpty
           ? _buildEmptyState()
-          : ListView(
+          : RefreshIndicator(
+              onRefresh: _refreshPrices,
+              child: ListView(
               children: [
                 // 今日盈亏大卡片（重点展示）
                 _DailyPnlHeroCard(
@@ -116,6 +157,7 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
                 const SizedBox(height: 32),
               ],
             ),
+          ),
     );
   }
 
