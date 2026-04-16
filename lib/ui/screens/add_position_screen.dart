@@ -41,6 +41,7 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
   late StockMarket _selectedMarket;
   late BrokerageType _selectedPlatform;
   bool _isSaving = false;
+  bool _isDeleting = false;
   bool _isLookingUp = false;
   Timer? _debounceTimer;
 
@@ -268,10 +269,79 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
                 minimumSize: const Size(double.infinity, 48),
               ),
             ),
+
+            // 编辑模式下：底部"删除持仓"按钮
+            if (widget.isEditing) ...[
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: _isSaving || _isDeleting ? null : _delete,
+                icon: _isDeleting
+                    ? SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.red.shade700,
+                        ),
+                      )
+                    : Icon(Icons.delete_outline, color: Colors.red.shade700),
+                label: Text(
+                  '删除持仓',
+                  style: TextStyle(color: Colors.red.shade700),
+                ),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  side: BorderSide(color: Colors.red.shade300),
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _delete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('确认删除'),
+        content: Text(
+          '确定要删除 ${_nameController.text.trim()} 的持仓吗？此操作无法撤销。',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    setState(() => _isDeleting = true);
+
+    try {
+      await ref
+          .read(positionRepositoryProvider)
+          .delete(widget.editPositionId!);
+      if (mounted) {
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('删除失败: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isDeleting = false);
+    }
   }
 
   Future<void> _save() async {

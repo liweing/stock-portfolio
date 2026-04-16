@@ -6,13 +6,11 @@ import '../../models/portfolio_summary.dart';
 class PositionTile extends StatelessWidget {
   final PositionPnl pnl;
   final VoidCallback? onTap;
-  final VoidCallback? onDelete;
 
   const PositionTile({
     super.key,
     required this.pnl,
     this.onTap,
-    this.onDelete,
   });
 
   @override
@@ -21,36 +19,7 @@ class PositionTile extends StatelessWidget {
     // A股用红涨绿跌
     final pnlColor = pnl.isProfit ? Colors.red.shade700 : Colors.green.shade700;
 
-    return Dismissible(
-      key: Key('position_${pnl.positionId}'),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        color: Colors.red,
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      confirmDismiss: (_) async {
-        return await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('确认删除'),
-            content: Text('确定要删除 ${pnl.name} 的持仓吗？'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('取消'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('删除', style: TextStyle(color: Colors.red)),
-              ),
-            ],
-          ),
-        );
-      },
-      onDismissed: (_) => onDelete?.call(),
-      child: ListTile(
+    return ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         title: Row(
@@ -179,7 +148,6 @@ class PositionTile extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }

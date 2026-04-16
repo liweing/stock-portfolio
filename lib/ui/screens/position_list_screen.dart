@@ -175,7 +175,6 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
       for (final pnl in entry.value) {
         widgets.add(PositionTile(
           pnl: pnl,
-          onDelete: () => _deletePosition(pnl.positionId),
           onTap: () => _navigateToEdit(pnl),
         ));
         widgets.add(const Divider(height: 1, indent: 16, endIndent: 16));
@@ -216,10 +215,4 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
     }
   }
 
-  Future<void> _deletePosition(int id) async {
-    await ref.read(positionRepositoryProvider).delete(id);
-    // Supabase stream + RLS 过滤对 DELETE 事件有已知限制，
-    // 这里手动 invalidate 强制刷新持仓流
-    ref.invalidate(allPositionsProvider);
-  }
 }
