@@ -278,7 +278,11 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
 
     if (!result.hasUpdate) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('已是最新版本 ${result.currentVersion}')),
+        SnackBar(
+          content: Text(
+            '已是最新版本 ${result.currentVersion}+${result.currentBuild}',
+          ),
+        ),
       );
       return;
     }
@@ -287,13 +291,13 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
     final shouldUpdate = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('发现新版本 ${latest.version}'),
+        title: Text('发现新版本 ${latest.version}+${latest.build}'),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('当前版本：${result?.currentVersion}'),
+              Text('当前版本：${result?.currentVersion}+${result?.currentBuild}'),
               const SizedBox(height: 12),
               const Text(
                 '更新内容：',

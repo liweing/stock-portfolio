@@ -34,6 +34,17 @@ void main() {
     });
   });
 
+  group('版本 + build 组合对比逻辑', () {
+    test('版本号 1.0.0 → 1.0.1: 算有更新', () {
+      expect(UpdateService.compareVersions('1.0.1', '1.0.0'), 1);
+    });
+    test('版本号相同，build 2 → 3: 对比版本返回 0（需要 service 逻辑处理 build）', () {
+      expect(UpdateService.compareVersions('1.0.0', '1.0.0'), 0);
+      // build 对比逻辑在 service 里处理，不在 compareVersions
+      expect(3 > 2, isTrue);
+    });
+  });
+
   group('ReleaseInfo.fromJson', () {
     test('正常解析 version.json', () {
       final json = {

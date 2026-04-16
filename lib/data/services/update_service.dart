@@ -84,8 +84,17 @@ class UpdateService {
       // 网络失败：返回无更新
     }
 
-    final hasUpdate = latest != null &&
-        compareVersions(latest.version, local.version) > 0;
+    // 先比 version（主版本号），相同则比 build（构建号）
+    var hasUpdate = false;
+    if (latest != null) {
+      final versionDiff = compareVersions(latest.version, local.version);
+      if (versionDiff > 0) {
+        hasUpdate = true;
+      } else if (versionDiff == 0) {
+        final localBuild = int.tryParse(local.build) ?? 0;
+        hasUpdate = latest.build > localBuild;
+      }
+    }
 
     return UpdateCheckResult(
       currentVersion: local.version,
