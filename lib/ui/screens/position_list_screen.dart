@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/stock_repository.dart';
 import '../../models/portfolio_summary.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../data/services/update_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/database_provider.dart';
 import '../../providers/portfolio_providers.dart';
 import '../../providers/position_providers.dart';
+import '../../providers/update_provider.dart';
 import '../widgets/pnl_card.dart';
 import '../widgets/position_tile.dart';
 import 'add_position_screen.dart';
@@ -76,8 +79,13 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
           PopupMenuButton<String>(
             icon: const Icon(Icons.account_circle),
             onSelected: (value) async {
-              if (value == 'logout') {
-                await ref.read(authRepositoryProvider).signOut();
+              switch (value) {
+                case 'logout':
+                  await ref.read(authRepositoryProvider).signOut();
+                  break;
+                case 'check_update':
+                  await _checkForUpdate();
+                  break;
               }
             },
             itemBuilder: (context) => [
@@ -88,7 +96,34 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
                   style: const TextStyle(fontSize: 12),
                 ),
               ),
+              PopupMenuItem<String>(
+                enabled: false,
+                child: FutureBuilder<({String version, String build})>(
+                  future:
+                      ref.read(updateServiceProvider).getLocalVersion(),
+                  builder: (ctx, snap) {
+                    final v = snap.data;
+                    final text = v == null
+                        ? '版本 ...'
+                        : '版本 ${v.version} (${v.build})';
+                    return Text(
+                      text,
+                      style: const TextStyle(fontSize: 12),
+                    );
+                  },
+                ),
+              ),
               const PopupMenuDivider(),
+              const PopupMenuItem<String>(
+                value: 'check_update',
+                child: Row(
+                  children: [
+                    Icon(Icons.system_update, size: 18),
+                    SizedBox(width: 8),
+                    Text('检查更新'),
+                  ],
+                ),
+              ),
               const PopupMenuItem<String>(
                 value: 'logout',
                 child: Row(
@@ -215,4 +250,83 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
     }
   }
 
+  /// 检查更新（点菜单触发）
+  Future<void> _checkForUpdate() async {
+    // 转圈提示
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    UpdateCheckResult? result;
+    try {
+      result = await ref.read(updateServiceProvider).checkForUpdate();
+    } catch (_) {
+      // 网络错
+    }
+
+    if (!mounted) return;
+    Navigator.of(context).pop(); // 关 loading
+
+    if (result == null || result.latest == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('检查失败，请检查网络后重试')),
+      );
+      return;
+    }
+
+    if (!result.hasUpdate) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('已是最新版本 ${result.currentVersion}')),
+      );
+      return;
+    }
+
+    final latest = result.latest!;
+    final shouldUpdate = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('发现新版本 ${latest.version}'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('当前版本：${result?.currentVersion}'),
+              const SizedBox(height: 12),
+              const Text(
+                '更新内容：',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                latest.body.isEmpty ? '（无详细说明）' : latest.body,
+                style: const TextStyle(fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('稍后'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('立即下载'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldUpdate == true) {
+      // 优先 APK 直链，否则跳 GitHub release 页面
+      final url = latest.apkDownloadUrl ?? latest.htmlUrl;
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    }
+  }
 }
