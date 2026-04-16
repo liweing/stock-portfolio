@@ -3,550 +3,825 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="持仓助手 - 唯一支持 A股/港股/美股/基金，跨平台聚合的持仓管理工具">
+  <meta name="description" content="持仓助手 — 跨平台股票/基金持仓聚合分析工具">
+  <meta name="theme-color" content="#0a0e27">
   <meta property="og:title" content="持仓助手">
-  <meta property="og:description" content="跨平台股票持仓聚合分析工具">
-  <title>持仓助手 - 跨平台持仓聚合分析工具</title>
+  <meta property="og:description" content="一款支持 A 股、港股、美股、基金的跨平台持仓管理工具">
+  <title>持仓助手 — 看清你所有的投资</title>
   <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ===== Reset ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-                   "Microsoft YaHei", "Helvetica Neue", sans-serif;
-      color: #1a1a1a;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #e6e9f0;
+      background: #0a0e27;
       line-height: 1.6;
-      background: #fafafa;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+    /* ===== 渐变背景 mesh ===== */
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.20), transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(236, 72, 153, 0.12), transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(59, 130, 246, 0.18), transparent 50%),
+        #0a0e27;
+    }
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, black, transparent 70%);
     }
 
-    /* Hero */
-    .hero {
-      background: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%);
-      color: white;
-      padding: 80px 24px 100px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    /* ===== Nav ===== */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(20px);
+      background: rgba(10, 14, 39, 0.6);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 14px 24px;
     }
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -20%;
-      width: 60%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
-      pointer-events: none;
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .hero-icon {
-      font-size: 56px;
-      margin-bottom: 16px;
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
+    .logo-mark {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
     }
-    .hero h1 {
-      font-size: clamp(36px, 6vw, 56px);
-      font-weight: 700;
-      margin-bottom: 16px;
-      letter-spacing: -1px;
+    .nav-links { display: flex; gap: 8px; }
+    .nav-link {
+      padding: 8px 14px; border-radius: 8px;
+      font-size: 14px; font-weight: 500;
+      transition: all 0.2s;
+      color: #94a3b8;
     }
-    .hero p.tagline {
-      font-size: clamp(15px, 2.5vw, 18px);
-      opacity: 0.92;
-      max-width: 680px;
-      margin: 0 auto 40px;
-      padding: 0 16px;
-    }
-
-    /* Download Buttons */
-    .downloads {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      max-width: 800px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-    .btn {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 18px 32px;
-      min-width: 180px;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      border: none;
-      cursor: pointer;
-    }
-    .btn-icon { font-size: 28px; margin-bottom: 8px; }
-    .btn-label { font-size: 16px; font-weight: 700; }
-    .btn-sub { font-size: 12px; font-weight: 400; opacity: 0.75; margin-top: 2px; }
-
-    .btn-primary {
-      background: white;
-      color: #0d47a1;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    }
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    .btn-secondary {
-      background: rgba(255,255,255,0.18);
-      color: white;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.3);
-    }
-    .btn-secondary:hover {
-      background: rgba(255,255,255,0.28);
-      transform: translateY(-3px);
-    }
-    .btn-disabled {
-      background: rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.65);
-      cursor: not-allowed;
-      border: 1px dashed rgba(255,255,255,0.25);
-    }
-    .btn-disabled .btn-sub {
-      color: #ffd54f;
-      font-weight: 600;
-      opacity: 1;
-    }
-
-    /* Features Section */
-    section {
-      padding: 80px 24px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .section-title {
-      text-align: center;
-      font-size: clamp(28px, 4vw, 36px);
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #0d47a1;
-    }
-    .section-subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 56px;
-      font-size: 16px;
-    }
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
-    }
-    .feature {
-      background: white;
-      padding: 32px 24px;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    .nav-link:hover { background: rgba(255,255,255,0.06); color: white; }
+    .nav-cta {
+      padding: 8px 16px; border-radius: 8px;
+      background: linear-gradient(135deg, #6366f1, #818cf8);
+      color: white; font-size: 14px; font-weight: 600;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    .feature:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(13,71,161,0.1);
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
     }
-    .feature-icon {
-      font-size: 40px;
-      margin-bottom: 16px;
+
+    /* ===== Hero ===== */
+    .hero { padding: 80px 24px 100px; max-width: 1200px; margin: 0 auto; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 60px;
+      align-items: center;
     }
-    .feature-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #0d47a1;
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 999px;
+      font-size: 13px; font-weight: 500;
+      color: #a5b4fc;
+      margin-bottom: 24px;
     }
-    .feature-desc {
-      color: #555;
-      font-size: 14px;
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #4ade80;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 68px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 50%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero h1 .accent {
+      background: linear-gradient(135deg, #f472b6, #ec4899, #818cf8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-tagline {
+      font-size: clamp(15px, 1.5vw, 17px);
+      color: #94a3b8;
+      max-width: 540px;
+      margin-bottom: 36px;
       line-height: 1.7;
     }
 
-    /* Platforms */
-    .platforms-section {
-      background: white;
+    /* ===== CTA Buttons ===== */
+    .cta-row {
+      display: flex; gap: 14px; align-items: stretch;
+      flex-wrap: wrap; margin-bottom: 36px;
     }
-    .platforms {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 16px;
-      max-width: 800px;
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 28px;
+      border-radius: 12px;
+      font-size: 15px; font-weight: 600;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .cta-primary {
+      background: linear-gradient(135deg, #6366f1, #818cf8);
+      color: white;
+      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+    }
+    .cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5);
+    }
+    .cta-secondary {
+      background: rgba(255,255,255,0.05);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+    }
+    .cta-secondary:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+    .arrow { transition: transform 0.2s; }
+    .cta-btn:hover .arrow { transform: translateX(4px); }
+
+    /* ===== Trust Signals ===== */
+    .trust {
+      display: flex; gap: 32px; flex-wrap: wrap;
+      color: #64748b; font-size: 13px;
+    }
+    .trust-item { display: flex; align-items: center; gap: 6px; }
+    .trust-icon { color: #4ade80; font-weight: bold; }
+
+    /* ===== Phone Mockup ===== */
+    .phone-mockup {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
       margin: 0 auto;
+      perspective: 1000px;
     }
-    .platform-tag {
-      padding: 10px 20px;
-      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-      color: #0d47a1;
-      border-radius: 24px;
-      font-size: 15px;
-      font-weight: 600;
+    .phone-frame {
+      position: relative;
+      background: linear-gradient(145deg, #1e1e2e, #0f0f1e);
+      border-radius: 40px;
+      padding: 14px;
+      box-shadow:
+        0 30px 80px rgba(99, 102, 241, 0.3),
+        0 10px 40px rgba(0,0,0,0.5),
+        inset 0 0 0 1px rgba(255,255,255,0.1);
+      transform: rotateY(-8deg) rotateX(4deg);
+      transition: transform 0.5s ease;
+    }
+    .phone-mockup:hover .phone-frame {
+      transform: rotateY(-2deg) rotateX(0deg);
+    }
+    .phone-screen {
+      background: #0a0e27;
+      border-radius: 28px;
+      padding: 18px 16px;
+      aspect-ratio: 9/19;
+      overflow: hidden;
+      position: relative;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 8px; left: 50%;
+      transform: translateX(-50%);
+      width: 110px; height: 24px;
+      background: #0a0e27;
+      border-radius: 0 0 16px 16px;
+      z-index: 2;
     }
 
-    /* Why */
-    .why {
-      background: linear-gradient(135deg, #f5f5f5, #fafafa);
+    /* mock app content */
+    .mock-header {
+      text-align: center;
+      padding: 24px 0 16px;
+      font-size: 14px; font-weight: 600;
+      color: #a5b4fc;
     }
-    .why-grid {
+    .mock-card {
+      background: linear-gradient(135deg, rgba(244, 114, 182, 0.15), rgba(236, 72, 153, 0.05));
+      border: 1px solid rgba(244, 114, 182, 0.2);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .mock-card-label {
+      font-size: 11px; color: #f472b6; font-weight: 600; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mock-card-value {
+      font-size: 22px; font-weight: 800; color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .mock-card-pct {
+      font-size: 12px; color: #f472b6; margin-top: 4px;
+    }
+    .mock-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 12px;
+    }
+    .mock-row:last-child { border-bottom: none; }
+    .mock-stock {
+      display: flex; flex-direction: column;
+    }
+    .mock-stock-name { color: #e6e9f0; font-weight: 500; }
+    .mock-stock-code { color: #64748b; font-size: 10px; margin-top: 2px; }
+    .mock-price {
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff; font-weight: 600;
+    }
+    .mock-pct { font-size: 10px; }
+    .mock-up { color: #ef4444; }
+    .mock-down { color: #22c55e; }
+    .mock-section-title {
+      font-size: 11px; color: #64748b; font-weight: 500;
+      margin: 14px 0 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ===== Section ===== */
+    section { padding: 100px 24px; max-width: 1200px; margin: 0 auto; }
+    .section-eyebrow {
+      display: inline-block;
+      font-size: 13px; font-weight: 600;
+      color: #818cf8;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(32px, 4.5vw, 48px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+      max-width: 700px;
+    }
+    .section-title .accent {
+      background: linear-gradient(135deg, #f472b6, #818cf8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .section-subtitle {
+      color: #94a3b8;
+      font-size: 17px;
+      max-width: 600px;
+      margin-bottom: 56px;
+    }
+
+    /* ===== Stats ===== */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      padding: 40px 32px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+    .stat { text-align: center; }
+    .stat-value {
+      font-size: 40px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #818cf8, #f472b6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stat-label {
+      font-size: 13px; color: #94a3b8;
+      margin-top: 6px;
+    }
+
+    /* ===== Bento Grid ===== */
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-auto-rows: minmax(180px, auto);
+      gap: 16px;
+    }
+    .bento-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .bento-card:hover {
+      border-color: rgba(129, 140, 248, 0.3);
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-4px);
+    }
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(129, 140, 248, 0.5), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .bento-card:hover::before { opacity: 1; }
+    .bento-icon {
+      font-size: 32px;
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.1));
+      border: 1px solid rgba(129, 140, 248, 0.2);
+      margin-bottom: 16px;
+    }
+    .bento-title {
+      font-size: 18px; font-weight: 700; color: #fff;
+      margin-bottom: 8px;
+    }
+    .bento-desc {
+      font-size: 14px; color: #94a3b8; line-height: 1.7;
+    }
+
+    .b-2x1 { grid-column: span 2; grid-row: span 1; }
+    .b-3x1 { grid-column: span 3; grid-row: span 1; }
+    .b-3x2 { grid-column: span 3; grid-row: span 2; }
+    .b-4x1 { grid-column: span 4; grid-row: span 1; }
+    .b-2x2 { grid-column: span 2; grid-row: span 2; }
+
+    /* Hero Bento Card */
+    .b-feature-hero {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.05));
+      border-color: rgba(129, 140, 248, 0.3);
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .platform-badges {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
+    }
+    .platform-badge {
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #c7d2fe;
+    }
+
+    /* ===== Download Section ===== */
+    .download-section {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(236, 72, 153, 0.04));
+      border-radius: 32px;
+      padding: 60px 40px;
+      margin: 0 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
+    }
+    .download-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      max-width: 900px;
-      margin: 0 auto;
+      gap: 24px;
     }
-    .why-item {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      padding: 20px;
-    }
-    .why-check {
-      flex-shrink: 0;
-      width: 36px;
-      height: 36px;
-      background: #43a047;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    .why-text h4 {
-      font-size: 16px;
-      margin-bottom: 4px;
-      color: #0d47a1;
-    }
-    .why-text p {
-      font-size: 14px;
-      color: #555;
-    }
-
-    /* CTA Bottom */
-    .cta-bottom {
-      background: linear-gradient(135deg, #0d47a1, #1976d2);
-      color: white;
+    .dl-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 28px;
       text-align: center;
-      padding: 80px 24px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
     }
-    .cta-bottom h2 {
-      font-size: clamp(28px, 4vw, 36px);
-      font-weight: 700;
-      margin-bottom: 12px;
+    .dl-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(129, 140, 248, 0.4);
+      background: rgba(255,255,255,0.06);
     }
-    .cta-bottom p {
-      opacity: 0.85;
-      margin-bottom: 36px;
-      font-size: 16px;
-    }
-
-    /* Footer */
-    footer {
-      background: #0a1929;
-      color: #999;
-      text-align: center;
-      padding: 32px 24px;
-      font-size: 13px;
-    }
-    footer a {
-      color: #64b5f6;
-      text-decoration: none;
-      margin: 0 12px;
-    }
-    footer a:hover { color: #90caf9; }
-
-    /* QR 下载卡 */
-    .download-card {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 18px 22px;
-      min-width: 200px;
-      background: white;
-      color: #0d47a1;
-      border-radius: 14px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-      transition: all 0.2s;
-    }
-    .download-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    .download-card-title {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .qr-code {
-      width: 150px;
-      height: 150px;
-      background: white;
-      border-radius: 8px;
-      padding: 8px;
-      box-shadow: inset 0 0 0 1px #eee;
-    }
-    .qr-code img { width: 100%; height: 100%; display: block; }
-    .download-card-hint {
-      font-size: 12px;
-      color: #555;
-      margin-top: 10px;
-      text-align: center;
-      line-height: 1.4;
-    }
-    .download-card-link {
-      color: #1565c0;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 13px;
-      margin-top: 6px;
-      display: inline-block;
-    }
-    .download-card-link:hover { text-decoration: underline; }
-
-    /* iOS coming soon card */
-    .download-card.disabled {
-      background: rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.85);
-      box-shadow: none;
-      border: 1px dashed rgba(255,255,255,0.3);
+    .dl-card.disabled {
+      opacity: 0.6;
       cursor: not-allowed;
     }
-    .download-card.disabled .qr-placeholder {
-      width: 150px;
-      height: 150px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.05);
-      border: 1px dashed rgba(255,255,255,0.25);
-      border-radius: 8px;
+    .dl-card.disabled:hover { transform: none; border-color: rgba(255,255,255,0.08); }
+    .dl-icon {
       font-size: 36px;
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      margin: 0 auto 16px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(236, 72, 153, 0.1));
+      border: 1px solid rgba(129, 140, 248, 0.3);
     }
-    .download-card.disabled .download-card-hint {
-      color: #ffd54f;
-      font-weight: 600;
+    .dl-title {
+      font-size: 18px; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .dl-sub {
+      font-size: 13px; color: #94a3b8;
+      margin-bottom: 20px;
+    }
+    .dl-action {
+      display: inline-block;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #6366f1, #818cf8);
+      color: white;
+      border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+      transition: all 0.2s;
+    }
+    .dl-action:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); }
+    .dl-action-disabled {
+      background: rgba(255,255,255,0.06);
+      color: #fbbf24;
+      cursor: not-allowed;
+    }
+    .qr-wrap {
+      width: 160px; height: 160px;
+      margin: 0 auto 16px;
+      padding: 10px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .qr-wrap img { width: 100%; height: 100%; display: block; }
+    .qr-hint {
+      font-size: 13px; color: #94a3b8;
+      margin-bottom: 10px;
     }
 
-    /* 让卡片排列时更平衡 */
-    .downloads {
-      align-items: stretch;
+    /* ===== Footer ===== */
+    footer {
+      padding: 60px 24px 40px;
+      max-width: 1200px; margin: 80px auto 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer-brand .logo { margin-bottom: 12px; }
+    .footer-desc {
+      color: #64748b; font-size: 14px; max-width: 320px;
+    }
+    .footer-col h4 {
+      font-size: 13px; color: #fff; font-weight: 600;
+      margin-bottom: 16px;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .footer-col a {
+      display: block; color: #94a3b8; font-size: 14px;
+      padding: 4px 0;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: #818cf8; }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      color: #64748b; font-size: 12px;
+      flex-wrap: wrap; gap: 12px;
     }
 
-    @media (max-width: 600px) {
-      .hero { padding: 60px 20px 80px; }
+    /* ===== Animations ===== */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 0.8s ease forwards;
+    }
+    .fade-up.delay-1 { animation-delay: 0.1s; }
+    .fade-up.delay-2 { animation-delay: 0.2s; }
+    .fade-up.delay-3 { animation-delay: 0.3s; }
+    .fade-up.delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Floating animation for phone */
+    @keyframes float {
+      0%, 100% { transform: rotateY(-8deg) rotateX(4deg) translateY(0); }
+      50% { transform: rotateY(-8deg) rotateX(4deg) translateY(-12px); }
+    }
+    .phone-frame { animation: float 6s ease-in-out infinite; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 900px) {
+      .hero { padding: 40px 20px 60px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+      .phone-mockup { max-width: 260px; }
       section { padding: 60px 20px; }
-      .btn { min-width: 140px; padding: 14px 20px; }
-      .btn-icon { font-size: 24px; }
-      .download-card { min-width: 0; width: 100%; max-width: 280px; }
-      .qr-code, .qr-placeholder { width: 130px !important; height: 130px !important; }
+      .nav-links { display: none; }
+      .bento { grid-template-columns: 1fr; }
+      .b-2x1, .b-3x1, .b-3x2, .b-4x1, .b-2x2 {
+        grid-column: span 1; grid-row: span 1;
+      }
+      .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      .download-section { padding: 40px 20px; margin: 0 16px; border-radius: 20px; }
+    }
+    @media (max-width: 560px) {
+      .hero h1 { font-size: 38px; letter-spacing: -1px; }
+      .cta-btn { width: 100%; justify-content: center; }
+      .qr-wrap { width: 140px; height: 140px; }
     }
   </style>
 </head>
 <body>
+  <div class="bg-mesh"></div>
+  <div class="grid-overlay"></div>
 
-  <!-- HERO -->
-  <header class="hero">
-    <div class="hero-icon">📊</div>
-    <h1>持仓助手</h1>
-    <p class="tagline">
-      一款支持 A 股、港股、美股、基金的跨平台持仓管理工具<br>
-      聚合多个券商账户，看清全部投资的盈亏全貌
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <span class="logo-mark">📊</span>
+        持仓助手
+      </a>
+      <div class="nav-links">
+        <a href="#features" class="nav-link">功能</a>
+        <a href="#download" class="nav-link">下载</a>
+        <a href="https://github.com/liweing/stock-portfolio" target="_blank" class="nav-link">GitHub</a>
+      </div>
+      <a href="/" class="nav-cta">立即试用</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="badge fade-up">
+          <span class="badge-dot"></span>
+          v1.0.0 已上线 · 完全免费
+        </div>
+        <h1 class="fade-up delay-1">
+          看清你<span class="accent">所有的</span><br>
+          投资全貌
+        </h1>
+        <p class="hero-tagline fade-up delay-2">
+          一款支持 A 股、港股、美股、场外基金的跨平台持仓管理工具。<br>
+          聚合多个券商账户，一屏看清盈亏全貌，再也不用打开 5 个 App。
+        </p>
+        <div class="cta-row fade-up delay-3">
+          <a href="/" class="cta-btn cta-primary">
+            立即试用 <span class="arrow">→</span>
+          </a>
+          <a href="#download" class="cta-btn cta-secondary">
+            下载 App
+          </a>
+        </div>
+        <div class="trust fade-up delay-4">
+          <div class="trust-item"><span class="trust-icon">✓</span> 完全免费</div>
+          <div class="trust-item"><span class="trust-icon">✓</span> 无广告</div>
+          <div class="trust-item"><span class="trust-icon">✓</span> 开源</div>
+          <div class="trust-item"><span class="trust-icon">✓</span> 隐私友好</div>
+        </div>
+      </div>
+
+      <!-- Phone Mockup -->
+      <div class="phone-mockup fade-up delay-2">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="mock-header">投资分析</div>
+            <div class="mock-card">
+              <div class="mock-card-label">📈 今日盈亏 <span style="color:#22c55e">+0.80%</span></div>
+              <div class="mock-card-value">+¥30,558</div>
+              <div class="mock-card-pct">总市值 ¥3,842,572</div>
+            </div>
+            <div class="mock-section-title">按平台</div>
+            <div class="mock-row">
+              <div class="mock-stock">
+                <span class="mock-stock-name">富途</span>
+                <span class="mock-stock-code">8 只持仓</span>
+              </div>
+              <div style="text-align:right">
+                <div class="mock-price">¥2,031,240</div>
+                <div class="mock-pct mock-up">+¥24,278</div>
+              </div>
+            </div>
+            <div class="mock-row">
+              <div class="mock-stock">
+                <span class="mock-stock-name">支付宝</span>
+                <span class="mock-stock-code">3 只基金</span>
+              </div>
+              <div style="text-align:right">
+                <div class="mock-price">¥1,233,670</div>
+                <div class="mock-pct mock-up">+¥2,304</div>
+              </div>
+            </div>
+            <div class="mock-row">
+              <div class="mock-stock">
+                <span class="mock-stock-name">A股券商</span>
+                <span class="mock-stock-code">5 只持仓</span>
+              </div>
+              <div style="text-align:right">
+                <div class="mock-price">¥577,663</div>
+                <div class="mock-pct mock-down">-¥3,976</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section style="padding-top: 0;">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">4</div>
+        <div class="stat-label">支持市场</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">5+</div>
+        <div class="stat-label">券商平台</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">∞</div>
+        <div class="stat-label">持仓数量</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">80+</div>
+        <div class="stat-label">自动化测试</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">¥0</div>
+        <div class="stat-label">永久免费</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Bento -->
+  <section id="features">
+    <div class="section-eyebrow">CORE FEATURES</div>
+    <h2 class="section-title">告别多个 App<br>来回切换的<span class="accent">麻烦</span></h2>
+    <p class="section-subtitle">
+      你的投资分散在富途、老虎、A股券商、支付宝里？我们把它们都聚合在一个页面。
     </p>
 
-    <div class="downloads">
-      <!-- Web 入口 -->
-      <a href="/" class="btn btn-primary">
-        <span class="btn-icon">🌐</span>
-        <span class="btn-label">立即试用</span>
-        <span class="btn-sub">浏览器打开</span>
-      </a>
-
-      <!-- Android：QR 码扫码下载 -->
-      <div class="download-card">
-        <div class="download-card-title">📱 Android</div>
-        <div class="qr-code">
-          <img id="qr-android-hero" alt="Scan to download APK"
-               src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=https%3A%2F%2Fstock-portfolio-topaz.vercel.app%2Fdownloads%2Fapp-release.apk">
+    <div class="bento">
+      <!-- Big card: Multi-platform -->
+      <div class="bento-card b-3x2 b-feature-hero">
+        <div>
+          <div class="bento-icon">🌍</div>
+          <h3 class="bento-title">跨平台聚合</h3>
+          <p class="bento-desc">
+            富途、老虎、雪球、A 股券商、支付宝、其他渠道——
+            所有账户的持仓都聚合到同一个视图，再也不用切换 App。
+          </p>
         </div>
-        <div class="download-card-hint">📲 手机扫码直接下载</div>
-        <a href="/downloads/app-release.apk"
-           class="download-card-link">或点这里下载 ↓</a>
+        <div class="platform-badges">
+          <span class="platform-badge">🔵 富途</span>
+          <span class="platform-badge">🟠 老虎</span>
+          <span class="platform-badge">🟢 雪球</span>
+          <span class="platform-badge">🔴 A 股券商</span>
+          <span class="platform-badge">💙 支付宝</span>
+          <span class="platform-badge">⚪ 其他</span>
+        </div>
       </div>
 
-      <!-- iOS Coming Soon -->
-      <div class="download-card disabled">
-        <div class="download-card-title"> iOS</div>
-        <div class="qr-placeholder">⏳</div>
-        <div class="download-card-hint">Coming Soon</div>
-        <span class="download-card-link" style="color: rgba(255,255,255,0.5); cursor: not-allowed;">敬请期待</span>
+      <div class="bento-card b-3x1">
+        <div class="bento-icon">📈</div>
+        <h3 class="bento-title">实时行情</h3>
+        <p class="bento-desc">A 股、港股、美股、场外基金 — 一键刷新，全市场实时价格</p>
       </div>
-    </div>
-  </header>
 
-  <!-- FEATURES -->
-  <section>
-    <h2 class="section-title">核心功能</h2>
-    <p class="section-subtitle">告别多个 App 来回切换，一个页面看清所有投资</p>
+      <div class="bento-card b-3x1">
+        <div class="bento-icon">💰</div>
+        <h3 class="bento-title">智能盈亏</h3>
+        <p class="bento-desc">USD / HKD / CNY 自动换算，今日盈亏 + 累计收益清晰呈现</p>
+      </div>
 
-    <div class="features">
-      <div class="feature">
-        <div class="feature-icon">🌍</div>
-        <h3 class="feature-title">跨平台聚合</h3>
-        <p class="feature-desc">
-          富途、老虎、雪球、A股券商、支付宝<br>
-          所有账户持仓汇总到一处
-        </p>
+      <div class="bento-card b-2x1">
+        <div class="bento-icon">📊</div>
+        <h3 class="bento-title">饼图分析</h3>
+        <p class="bento-desc">点击扇区放大查看个股</p>
       </div>
-      <div class="feature">
-        <div class="feature-icon">📈</div>
-        <h3 class="feature-title">实时行情</h3>
-        <p class="feature-desc">
-          A 股、港股、美股、场外基金<br>
-          一键刷新，全市场实时价格
-        </p>
+
+      <div class="bento-card b-2x1">
+        <div class="bento-icon">☁️</div>
+        <h3 class="bento-title">云端同步</h3>
+        <p class="bento-desc">手机、电脑数据实时同步</p>
       </div>
-      <div class="feature">
-        <div class="feature-icon">💰</div>
-        <h3 class="feature-title">智能盈亏</h3>
-        <p class="feature-desc">
-          多币种自动换算人民币<br>
-          今日盈亏、累计收益、按平台明细
-        </p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">📊</div>
-        <h3 class="feature-title">可视化分析</h3>
-        <p class="feature-desc">
-          饼图展示仓位分布<br>
-          点击扇区查看个股详情
-        </p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">☁️</div>
-        <h3 class="feature-title">云端同步</h3>
-        <p class="feature-desc">
-          数据云端存储<br>
-          手机、电脑随时查看
-        </p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🔒</div>
-        <h3 class="feature-title">隐私友好</h3>
-        <p class="feature-desc">
-          数据加密存储，无广告<br>
-          不卖数据，不打扰
-        </p>
+
+      <div class="bento-card b-2x1">
+        <div class="bento-icon">🔄</div>
+        <h3 class="bento-title">自动升级</h3>
+        <p class="bento-desc">App 内一键检测新版本</p>
       </div>
     </div>
   </section>
 
-  <!-- PLATFORMS -->
-  <section class="platforms-section" style="padding: 60px 24px;">
-    <h2 class="section-title">支持的券商平台</h2>
-    <p class="section-subtitle">无论你的资产分散在哪里，都能完整聚合</p>
-    <div class="platforms">
-      <span class="platform-tag">🔵 富途</span>
-      <span class="platform-tag">🟠 老虎</span>
-      <span class="platform-tag">🟢 雪球</span>
-      <span class="platform-tag">🔴 A 股券商</span>
-      <span class="platform-tag">💙 支付宝</span>
-      <span class="platform-tag">⚪ 其他</span>
+  <!-- Download Section -->
+  <section id="download" style="padding-bottom: 0;">
+    <div style="text-align: center; margin-bottom: 56px;">
+      <div class="section-eyebrow">DOWNLOAD</div>
+      <h2 class="section-title" style="margin: 0 auto 16px;">3 分钟开始<br>看清你的<span class="accent">投资全貌</span></h2>
+      <p class="section-subtitle" style="margin: 0 auto;">免费下载，无需注册即可试用 Web 版</p>
     </div>
-  </section>
+    <div class="download-section">
+      <div class="download-grid">
+        <!-- Web -->
+        <div class="dl-card">
+          <div class="dl-icon">🌐</div>
+          <div class="dl-title">Web 版</div>
+          <div class="dl-sub">浏览器直接打开，无需安装</div>
+          <a href="/" class="dl-action">立即试用 →</a>
+        </div>
 
-  <!-- WHY -->
-  <section class="why">
-    <h2 class="section-title">为什么选择持仓助手</h2>
-    <p class="section-subtitle">不止是又一个理财 App</p>
-    <div class="why-grid">
-      <div class="why-item">
-        <div class="why-check">✓</div>
-        <div class="why-text">
-          <h4>真正跨平台</h4>
-          <p>市面上没有一款工具能同时管理这么多券商，包括场外基金</p>
+        <!-- Android with QR -->
+        <div class="dl-card">
+          <div class="qr-wrap">
+            <img alt="Scan QR to download Android APK"
+                 src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&color=0a0e27&bgcolor=ffffff&data=https%3A%2F%2Fstock-portfolio-topaz.vercel.app%2Fdownloads%2Fapp-release.apk">
+          </div>
+          <div class="dl-title">Android</div>
+          <div class="dl-sub">📲 手机扫码直接安装</div>
+          <a href="/downloads/app-release.apk" class="dl-action">点击下载 ↓</a>
         </div>
-      </div>
-      <div class="why-item">
-        <div class="why-check">✓</div>
-        <div class="why-text">
-          <h4>多币种支持</h4>
-          <p>美元、港币、人民币自动换算，盈亏一目了然</p>
-        </div>
-      </div>
-      <div class="why-item">
-        <div class="why-check">✓</div>
-        <div class="why-text">
-          <h4>极简设计</h4>
-          <p>没有广告、没有诱导消费，专注数据本身</p>
-        </div>
-      </div>
-      <div class="why-item">
-        <div class="why-check">✓</div>
-        <div class="why-text">
-          <h4>免费使用</h4>
-          <p>核心功能全免费，完全开源</p>
-        </div>
-      </div>
-      <div class="why-item">
-        <div class="why-check">✓</div>
-        <div class="why-text">
-          <h4>跨设备使用</h4>
-          <p>Web 网页、Android 应用全部覆盖，iOS 即将上线</p>
-        </div>
-      </div>
-      <div class="why-item">
-        <div class="why-check">✓</div>
-        <div class="why-text">
-          <h4>持续更新</h4>
-          <p>App 内一键检测新版本，新功能持续迭代</p>
+
+        <!-- iOS -->
+        <div class="dl-card disabled">
+          <div class="dl-icon" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(255,255,255,0.05)); border-color: rgba(251, 191, 36, 0.3)">⏳</div>
+          <div class="dl-title">iOS</div>
+          <div class="dl-sub">敬请期待</div>
+          <span class="dl-action dl-action-disabled">Coming Soon</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA BOTTOM -->
-  <section class="cta-bottom">
-    <h2>开始管理你的投资组合</h2>
-    <p>3 分钟添加持仓，看清全市场资产</p>
-    <div class="downloads">
-      <a href="/" class="btn btn-primary">
-        <span class="btn-icon">🚀</span>
-        <span class="btn-label">立即试用</span>
-        <span class="btn-sub">无需安装</span>
-      </a>
-      <div class="download-card">
-        <div class="download-card-title">📱 Android</div>
-        <div class="qr-code">
-          <img alt="Scan to download APK"
-               src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=https%3A%2F%2Fstock-portfolio-topaz.vercel.app%2Fdownloads%2Fapp-release.apk">
-        </div>
-        <div class="download-card-hint">扫码下载 · 免费</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
+  <!-- Footer -->
   <footer>
-    <p>持仓助手 · 由独立开发者制作 · 开源免费</p>
-    <p style="margin-top: 8px;">
-      <a href="https://github.com/liweing/stock-portfolio" target="_blank">GitHub</a>
-      <a href="/">Web 版</a>
-      <a href="https://github.com/liweing/stock-portfolio/issues" target="_blank">反馈问题</a>
-    </p>
-    <p style="margin-top: 16px; font-size: 11px; opacity: 0.6;">
-      投资有风险，入市需谨慎。本工具仅提供数据聚合服务，不构成任何投资建议。
-    </p>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <span class="logo-mark">📊</span>
+          持仓助手
+        </div>
+        <p class="footer-desc">
+          独立开发者作品，专注做好一件事：让你看清所有投资。
+          完全免费、无广告、开源。
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>产品</h4>
+        <a href="/">Web 版</a>
+        <a href="/downloads/app-release.apk">Android 下载</a>
+        <a href="#">iOS（Coming Soon）</a>
+      </div>
+      <div class="footer-col">
+        <h4>关于</h4>
+        <a href="https://github.com/liweing/stock-portfolio" target="_blank">GitHub</a>
+        <a href="https://github.com/liweing/stock-portfolio/issues" target="_blank">问题反馈</a>
+        <a href="https://github.com/liweing/stock-portfolio/releases" target="_blank">版本历史</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 持仓助手 · 由独立开发者制作</div>
+      <div>⚠️ 投资有风险，本工具仅提供数据聚合服务，不构成投资建议</div>
+    </div>
   </footer>
 
 </body>
