@@ -163,30 +163,32 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
 
             const SizedBox(height: 20),
 
-            // 股票代码
+            // 代码
             TextFormField(
               controller: _symbolController,
-              decoration: const InputDecoration(
-                labelText: '股票代码',
-                hintText: '如 600519、00700、AAPL',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.tag),
+              decoration: InputDecoration(
+                labelText: _selectedMarket.isFund ? '基金代码' : '股票代码',
+                hintText: _selectedMarket.isFund
+                    ? '如 000071、025492'
+                    : '如 600519、00700、AAPL',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.tag),
               ),
               textCapitalization: TextCapitalization.characters,
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? '请输入股票代码' : null,
+                  (v == null || v.trim().isEmpty) ? '请输入代码' : null,
             ),
 
             const SizedBox(height: 16),
 
-            // 股票名称
+            // 名称
             TextFormField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: '股票名称',
+                labelText: _selectedMarket.isFund ? '基金名称' : '股票名称',
                 hintText: '输入代码后自动查询，也可手动输入',
                 border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.business),
+                prefixIcon: const Icon(Icons.business_outlined),
                 suffixIcon: _isLookingUp
                     ? const Padding(
                         padding: EdgeInsets.all(12),
@@ -199,19 +201,26 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
                     : null,
               ),
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? '请输入股票名称' : null,
+                  (v == null || v.trim().isEmpty) ? '请输入名称' : null,
             ),
 
             const SizedBox(height: 16),
 
-            // 持仓数量
+            // 持仓数量 / 份额（基金叫"份额"，股票叫"数量"）
             TextFormField(
               controller: _quantityController,
-              decoration: const InputDecoration(
-                labelText: '持仓数量（股）',
-                hintText: '如 100',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.numbers),
+              decoration: InputDecoration(
+                labelText: _selectedMarket.isFund
+                    ? '持仓份额'
+                    : '持仓数量（股）',
+                hintText: _selectedMarket.isFund ? '如 1000.00' : '如 100',
+                border: const OutlineInputBorder(),
+                prefixIcon: Icon(
+                  _selectedMarket.isFund
+                      ? Icons.donut_small_outlined
+                      : Icons.numbers,
+                ),
+                suffixText: _selectedMarket.isFund ? '份' : '股',
               ),
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
@@ -228,15 +237,17 @@ class _AddPositionScreenState extends ConsumerState<AddPositionScreen> {
 
             const SizedBox(height: 16),
 
-            // 平均成本
+            // 平均成本（基金叫"成本净值"，股票叫"成本价"）
             TextFormField(
               controller: _costController,
               decoration: InputDecoration(
-                labelText: '平均成本价',
-                hintText: '如 1800.50',
+                labelText: _selectedMarket.isFund
+                    ? '成本净值'
+                    : '平均成本价',
+                hintText: _selectedMarket.isFund ? '如 1.0487' : '如 1800.50',
                 border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.attach_money),
-                suffixText: _selectedMarket.currency,
+                prefixIcon: const Icon(Icons.payments_outlined),
+                suffixText: _selectedMarket.currencySymbol,
               ),
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
