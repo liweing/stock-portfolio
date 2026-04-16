@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="app-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     /* ===== Reset ===== */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,7 +20,7 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
       color: #e6e9f0;
-      background: #0a0e27;
+      background: #060818;
       line-height: 1.6;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
@@ -28,29 +28,51 @@
     a { color: inherit; text-decoration: none; }
     button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
 
-    /* ===== 渐变背景 mesh ===== */
+    /* ===== 渐变 mesh + 浮动 orb ===== */
     .bg-mesh {
-      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      position: fixed; inset: 0; z-index: -2; pointer-events: none;
       background:
-        radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.20), transparent 50%),
-        radial-gradient(ellipse at 80% 30%, rgba(236, 72, 153, 0.12), transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(59, 130, 246, 0.18), transparent 50%),
-        #0a0e27;
+        radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.18), transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(236, 72, 153, 0.10), transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(59, 130, 246, 0.15), transparent 50%),
+        #060818;
     }
     .grid-overlay {
       position: fixed; inset: 0; z-index: -1; pointer-events: none;
       background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: radial-gradient(ellipse at center, black, transparent 70%);
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+    }
+    .orb {
+      position: fixed; border-radius: 50%; pointer-events: none; z-index: -1;
+      filter: blur(60px); opacity: 0.5;
+    }
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      top: 10%; left: -100px;
+      animation: float-orb 20s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 350px; height: 350px;
+      background: linear-gradient(135deg, #ec4899, #f43f5e);
+      top: 30%; right: -100px;
+      animation: float-orb 25s ease-in-out infinite reverse;
+    }
+    @keyframes float-orb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, 40px) scale(1.05); }
+      66% { transform: translate(-30px, 60px) scale(0.95); }
     }
 
     /* ===== Nav ===== */
     .nav {
       position: sticky; top: 0; z-index: 50;
-      backdrop-filter: blur(20px);
-      background: rgba(10, 14, 39, 0.6);
+      backdrop-filter: blur(24px) saturate(150%);
+      -webkit-backdrop-filter: blur(24px) saturate(150%);
+      background: rgba(6, 8, 24, 0.75);
       border-bottom: 1px solid rgba(255,255,255,0.06);
       padding: 14px 24px;
     }
@@ -58,17 +80,22 @@
       max-width: 1200px; margin: 0 auto;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 17px;
+      transition: transform 0.2s;
+    }
+    .logo:hover { transform: scale(1.02); }
     .logo-mark {
       width: 32px; height: 32px;
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
       background: white;
       padding: 4px;
-      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4), inset 0 0 0 1px rgba(255,255,255,0.4);
     }
     .logo-mark img { width: 100%; height: 100%; object-fit: contain; }
-    .nav-links { display: flex; gap: 8px; }
+    .nav-links { display: flex; gap: 4px; }
     .nav-link {
       padding: 8px 14px; border-radius: 8px;
       font-size: 14px; font-weight: 500;
@@ -77,33 +104,42 @@
     }
     .nav-link:hover { background: rgba(255,255,255,0.06); color: white; }
     .nav-cta {
-      padding: 8px 16px; border-radius: 8px;
+      padding: 8px 18px; border-radius: 10px;
       background: linear-gradient(135deg, #6366f1, #818cf8);
       color: white; font-size: 14px; font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-cta::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      opacity: 0; transition: opacity 0.25s;
     }
     .nav-cta:hover {
       transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.5);
     }
+    .nav-cta:hover::before { opacity: 1; }
 
     /* ===== Hero ===== */
-    .hero { padding: 80px 24px 100px; max-width: 1200px; margin: 0 auto; }
+    .hero { padding: 80px 24px 100px; max-width: 1200px; margin: 0 auto; position: relative; }
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
+      grid-template-columns: 1.1fr 1fr;
       gap: 60px;
       align-items: center;
     }
     .badge {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 6px 14px;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.35);
       border-radius: 999px;
       font-size: 13px; font-weight: 500;
       color: #a5b4fc;
       margin-bottom: 24px;
+      backdrop-filter: blur(10px);
     }
     .badge-dot {
       width: 6px; height: 6px;
@@ -113,36 +149,45 @@
       animation: pulse 2s ease-in-out infinite;
     }
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.2); }
     }
 
     .hero h1 {
-      font-size: clamp(40px, 6vw, 68px);
+      font-size: clamp(40px, 6vw, 72px);
       font-weight: 900;
       line-height: 1.05;
-      letter-spacing: -2px;
+      letter-spacing: -2.5px;
       margin-bottom: 24px;
-      background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 50%, #a5b4fc 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 60%, #a5b4fc 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .hero h1 .accent {
-      background: linear-gradient(135deg, #f472b6, #ec4899, #818cf8);
+      background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #818cf8 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
+      position: relative;
+      display: inline-block;
+    }
+    .hero h1 .accent::after {
+      content: ''; position: absolute;
+      bottom: -2px; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(244, 114, 182, 0.6), transparent);
+      border-radius: 2px;
     }
     .hero-tagline {
-      font-size: clamp(15px, 1.5vw, 17px);
+      font-size: clamp(15px, 1.5vw, 18px);
       color: #94a3b8;
       max-width: 540px;
       margin-bottom: 36px;
       line-height: 1.7;
     }
 
-    /* ===== CTA Buttons ===== */
+    /* ===== CTA ===== */
     .cta-row {
       display: flex; gap: 14px; align-items: stretch;
       flex-wrap: wrap; margin-bottom: 36px;
@@ -154,15 +199,24 @@
       font-size: 15px; font-weight: 600;
       transition: all 0.25s ease;
       white-space: nowrap;
+      position: relative;
+      overflow: hidden;
     }
     .cta-primary {
       background: linear-gradient(135deg, #6366f1, #818cf8);
       color: white;
       box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
     }
+    .cta-primary::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+    }
+    .cta-primary:hover::before { transform: translateX(100%); }
     .cta-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5);
+      box-shadow: 0 12px 40px rgba(99, 102, 241, 0.55);
     }
     .cta-secondary {
       background: rgba(255,255,255,0.05);
@@ -172,48 +226,66 @@
     }
     .cta-secondary:hover {
       background: rgba(255,255,255,0.08);
-      border-color: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.25);
       transform: translateY(-2px);
     }
-    .arrow { transition: transform 0.2s; }
+    .arrow { transition: transform 0.2s; display: inline-block; }
     .cta-btn:hover .arrow { transform: translateX(4px); }
 
-    /* ===== Trust Signals ===== */
+    /* ===== Trust ===== */
     .trust {
-      display: flex; gap: 32px; flex-wrap: wrap;
+      display: flex; gap: 28px; flex-wrap: wrap;
       color: #64748b; font-size: 13px;
     }
     .trust-item { display: flex; align-items: center; gap: 6px; }
-    .trust-icon { color: #4ade80; font-weight: bold; }
+    .trust-icon {
+      color: #4ade80; font-weight: bold;
+      width: 16px; height: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(74, 222, 128, 0.12);
+      border-radius: 50%;
+      font-size: 10px;
+    }
 
-    /* ===== Phone Mockup ===== */
+    /* ===== Phone Mockup（更精致，镜像真实 App） ===== */
+    .phone-stage {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      perspective: 1200px;
+    }
     .phone-mockup {
       position: relative;
       width: 100%;
-      max-width: 320px;
-      margin: 0 auto;
-      perspective: 1000px;
+      transform-style: preserve-3d;
     }
     .phone-frame {
       position: relative;
-      background: linear-gradient(145deg, #1e1e2e, #0f0f1e);
-      border-radius: 40px;
+      background: linear-gradient(145deg, #1a1a2e, #0a0a18);
+      border-radius: 44px;
       padding: 14px;
       box-shadow:
-        0 30px 80px rgba(99, 102, 241, 0.3),
-        0 10px 40px rgba(0,0,0,0.5),
-        inset 0 0 0 1px rgba(255,255,255,0.1);
-      transform: rotateY(-8deg) rotateX(4deg);
-      transition: transform 0.5s ease;
+        0 40px 100px rgba(99, 102, 241, 0.35),
+        0 20px 60px rgba(236, 72, 153, 0.18),
+        0 0 0 1.5px rgba(255,255,255,0.06),
+        inset 0 0 0 1px rgba(255,255,255,0.05);
+      transform: rotateY(-12deg) rotateX(6deg);
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: float 8s ease-in-out infinite;
     }
-    .phone-mockup:hover .phone-frame {
-      transform: rotateY(-2deg) rotateX(0deg);
+    .phone-stage:hover .phone-frame {
+      transform: rotateY(-4deg) rotateX(2deg);
+    }
+    @keyframes float {
+      0%, 100% { transform: rotateY(-12deg) rotateX(6deg) translateY(0); }
+      50% { transform: rotateY(-12deg) rotateX(6deg) translateY(-14px); }
     }
     .phone-screen {
       background: #0a0e27;
-      border-radius: 28px;
-      padding: 18px 16px;
-      aspect-ratio: 9/19;
+      border-radius: 32px;
+      padding: 0;
+      aspect-ratio: 9/19.5;
       overflow: hidden;
       position: relative;
     }
@@ -221,80 +293,163 @@
       position: absolute;
       top: 8px; left: 50%;
       transform: translateX(-50%);
-      width: 110px; height: 24px;
-      background: #0a0e27;
-      border-radius: 0 0 16px 16px;
-      z-index: 2;
+      width: 110px; height: 22px;
+      background: #000;
+      border-radius: 0 0 14px 14px;
+      z-index: 10;
     }
 
-    /* mock app content */
-    .mock-header {
+    /* ===== Mockup 内容（精确镜像 App） ===== */
+    .app-mock { padding: 36px 14px 20px; }
+    .app-header {
       text-align: center;
-      padding: 24px 0 16px;
-      font-size: 14px; font-weight: 600;
-      color: #a5b4fc;
-    }
-    .mock-card {
-      background: linear-gradient(135deg, rgba(244, 114, 182, 0.15), rgba(236, 72, 153, 0.05));
-      border: 1px solid rgba(244, 114, 182, 0.2);
-      border-radius: 16px;
-      padding: 16px;
+      font-size: 13px; font-weight: 600;
+      color: #94a3b8;
       margin-bottom: 14px;
+      position: relative;
     }
-    .mock-card-label {
-      font-size: 11px; color: #f472b6; font-weight: 600; margin-bottom: 6px;
+    .app-header::after {
+      content: ''; position: absolute; right: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 18px; height: 18px;
+      background: rgba(99, 102, 241, 0.15);
+      border-radius: 50%;
+    }
+
+    /* 今日盈亏 hero card —— 完全模拟真实 App 渐变 */
+    .mock-hero {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.20), rgba(239, 68, 68, 0.04));
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 14px;
+      padding: 13px 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.12);
+    }
+    .mock-hero-top {
+      display: flex; align-items: center;
+      margin-bottom: 8px;
+    }
+    .mock-hero-label {
+      color: #ef4444; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .mock-hero-pct {
+      margin-left: auto;
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 10px; font-weight: 700;
+    }
+    .mock-hero-amount {
+      color: #ef4444;
+      font-size: 26px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -1px;
+      margin-bottom: 2px;
+    }
+    .mock-hero-sub {
+      color: #94a3b8; font-size: 10px;
+    }
+
+    /* 投资组合总览卡 */
+    .mock-summary {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .mock-summary-title {
       display: flex; align-items: center; gap: 6px;
+      color: #fff; font-size: 11px; font-weight: 700;
+      margin-bottom: 8px;
     }
-    .mock-card-value {
-      font-size: 22px; font-weight: 800; color: #fff;
+    .mock-summary-tag {
+      background: rgba(129, 140, 248, 0.15);
+      color: #c7d2fe;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+    }
+    .mock-grid-2 {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px;
+    }
+    .mock-stat-label { font-size: 9px; color: #64748b; }
+    .mock-stat-value {
+      font-size: 13px; font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+    }
+    .mock-stat-value.up { color: #ef4444; }
+
+    /* 按平台标题 */
+    .mock-section {
+      font-size: 10px; color: #94a3b8; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1px;
+      margin: 8px 4px 6px;
+    }
+
+    /* 平台卡片 */
+    .mock-platform {
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+    }
+    .mock-platform-row {
+      display: flex; align-items: center;
+      margin-bottom: 6px;
+    }
+    .mock-platform-tag {
+      padding: 2px 8px;
+      background: rgba(129, 140, 248, 0.2);
+      color: #c7d2fe;
+      border-radius: 5px;
+      font-size: 10px; font-weight: 700;
+    }
+    .mock-platform-mv {
+      margin-left: auto;
+      font-size: 13px; font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+    }
+    .mock-platform-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;
+    }
+    .mock-cell-label { font-size: 8px; color: #64748b; }
+    .mock-cell-value {
+      font-size: 11px; font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
     }
-    .mock-card-pct {
-      font-size: 12px; color: #f472b6; margin-top: 4px;
-    }
-    .mock-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      font-size: 12px;
-    }
-    .mock-row:last-child { border-bottom: none; }
-    .mock-stock {
-      display: flex; flex-direction: column;
-    }
-    .mock-stock-name { color: #e6e9f0; font-weight: 500; }
-    .mock-stock-code { color: #64748b; font-size: 10px; margin-top: 2px; }
-    .mock-price {
-      font-family: 'JetBrains Mono', monospace;
-      color: #fff; font-weight: 600;
-    }
-    .mock-pct { font-size: 10px; }
-    .mock-up { color: #ef4444; }
-    .mock-down { color: #22c55e; }
-    .mock-section-title {
-      font-size: 11px; color: #64748b; font-weight: 500;
-      margin: 14px 0 6px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+    .up { color: #ef4444 !important; }
+    .down { color: #22c55e !important; }
 
     /* ===== Section ===== */
     section { padding: 100px 24px; max-width: 1200px; margin: 0 auto; }
     .section-eyebrow {
       display: inline-block;
-      font-size: 13px; font-weight: 600;
+      font-size: 12px; font-weight: 700;
       color: #818cf8;
       text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 12px;
+      letter-spacing: 2.5px;
+      margin-bottom: 14px;
+      padding: 4px 10px;
+      background: rgba(129, 140, 248, 0.1);
+      border-radius: 6px;
     }
     .section-title {
-      font-size: clamp(32px, 4.5vw, 48px);
+      font-size: clamp(32px, 4.5vw, 52px);
       font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -1px;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
       margin-bottom: 16px;
-      max-width: 700px;
+      max-width: 780px;
+      background: linear-gradient(135deg, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .section-title .accent {
       background: linear-gradient(135deg, #f472b6, #818cf8);
@@ -307,32 +462,50 @@
       font-size: 17px;
       max-width: 600px;
       margin-bottom: 56px;
+      line-height: 1.7;
     }
 
     /* ===== Stats ===== */
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      padding: 40px 32px;
-      background: rgba(255,255,255,0.03);
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+      padding: 36px;
+      background:
+        linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(236, 72, 153, 0.04)),
+        rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 20px;
+      border-radius: 24px;
       backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
     }
-    .stat { text-align: center; }
+    .stats::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(129, 140, 248, 0.6), transparent);
+    }
+    .stat {
+      text-align: center;
+      padding: 12px 8px;
+      border-radius: 12px;
+      transition: background 0.3s;
+    }
+    .stat:hover { background: rgba(255,255,255,0.03); }
     .stat-value {
-      font-size: 40px;
+      font-size: 44px;
       font-weight: 900;
-      background: linear-gradient(135deg, #818cf8, #f472b6);
+      background: linear-gradient(135deg, #818cf8 0%, #f472b6 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
       font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -2px;
     }
     .stat-label {
       font-size: 13px; color: #94a3b8;
-      margin-top: 6px;
+      margin-top: 4px;
+      font-weight: 500;
     }
 
     /* ===== Bento Grid ===== */
@@ -343,19 +516,14 @@
       gap: 16px;
     }
     .bento-card {
-      background: rgba(255,255,255,0.03);
+      background: rgba(255,255,255,0.025);
       border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 20px;
+      border-radius: 22px;
       padding: 28px;
       backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
-    }
-    .bento-card:hover {
-      border-color: rgba(129, 140, 248, 0.3);
-      background: rgba(255,255,255,0.05);
-      transform: translateY(-4px);
     }
     .bento-card::before {
       content: '';
@@ -364,132 +532,202 @@
       height: 1px;
       background: linear-gradient(90deg, transparent, rgba(129, 140, 248, 0.5), transparent);
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.4s;
+    }
+    .bento-card::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(129, 140, 248, 0.06), transparent 50%);
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.6s;
+      pointer-events: none;
+    }
+    .bento-card:hover {
+      border-color: rgba(129, 140, 248, 0.3);
+      background: rgba(255,255,255,0.04);
+      transform: translateY(-6px);
     }
     .bento-card:hover::before { opacity: 1; }
+    .bento-card:hover::after { transform: translate(-50%, -50%) scale(1); }
     .bento-icon {
-      font-size: 32px;
+      font-size: 26px;
       width: 52px; height: 52px;
-      border-radius: 12px;
+      border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.1));
-      border: 1px solid rgba(129, 140, 248, 0.2);
-      margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(236, 72, 153, 0.1));
+      border: 1px solid rgba(129, 140, 248, 0.25);
+      margin-bottom: 18px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
     }
     .bento-title {
-      font-size: 18px; font-weight: 700; color: #fff;
-      margin-bottom: 8px;
+      font-size: 19px; font-weight: 700; color: #fff;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
     }
     .bento-desc {
-      font-size: 14px; color: #94a3b8; line-height: 1.7;
+      font-size: 14px; color: #94a3b8; line-height: 1.65;
     }
 
-    .b-2x1 { grid-column: span 2; grid-row: span 1; }
-    .b-3x1 { grid-column: span 3; grid-row: span 1; }
+    .b-2x1 { grid-column: span 2; }
+    .b-3x1 { grid-column: span 3; }
     .b-3x2 { grid-column: span 3; grid-row: span 2; }
-    .b-4x1 { grid-column: span 4; grid-row: span 1; }
-    .b-2x2 { grid-column: span 2; grid-row: span 2; }
+    .b-4x1 { grid-column: span 4; }
 
-    /* Hero Bento Card */
     .b-feature-hero {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.05));
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(236, 72, 153, 0.04));
       border-color: rgba(129, 140, 248, 0.3);
       display: flex; flex-direction: column; justify-content: space-between;
     }
     .platform-badges {
-      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px;
     }
     .platform-badge {
-      padding: 6px 12px;
-      background: rgba(255,255,255,0.06);
+      padding: 7px 13px;
+      background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 999px;
       font-size: 12px;
       font-weight: 500;
       color: #c7d2fe;
+      transition: all 0.2s;
+    }
+    .platform-badge:hover {
+      background: rgba(129, 140, 248, 0.15);
+      border-color: rgba(129, 140, 248, 0.4);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* ===== How It Works ===== */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 38px;
+      left: 16.66%; right: 16.66%;
+      height: 2px;
+      background: linear-gradient(90deg,
+        rgba(129, 140, 248, 0.3),
+        rgba(236, 72, 153, 0.3),
+        rgba(129, 140, 248, 0.3));
+      z-index: 0;
+    }
+    .step {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 24px;
+    }
+    .step-number {
+      width: 76px; height: 76px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 2px solid rgba(129, 140, 248, 0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 800;
+      color: #a5b4fc;
+      margin: 0 auto 24px;
+      font-family: 'JetBrains Mono', monospace;
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+    }
+    .step-title {
+      font-size: 20px; font-weight: 700; color: #fff;
+      margin-bottom: 8px;
+    }
+    .step-desc {
+      font-size: 14px; color: #94a3b8; line-height: 1.7;
     }
 
     /* ===== Download Section ===== */
     .download-section {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(236, 72, 153, 0.04));
+      background:
+        linear-gradient(135deg, rgba(99, 102, 241, 0.10), rgba(236, 72, 153, 0.06)),
+        rgba(255,255,255,0.02);
       border-radius: 32px;
       padding: 60px 40px;
-      margin: 0 24px;
       max-width: 1200px;
       margin: 0 auto;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(129, 140, 248, 0.15);
       backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+    .download-section::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -10%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(244, 114, 182, 0.15), transparent 70%);
+      pointer-events: none;
     }
     .download-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 24px;
+      position: relative;
     }
     .dl-card {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 28px;
+      border-radius: 22px;
+      padding: 32px 28px;
       text-align: center;
-      transition: all 0.3s;
+      transition: all 0.35s;
       position: relative;
       overflow: hidden;
     }
     .dl-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-6px);
       border-color: rgba(129, 140, 248, 0.4);
       background: rgba(255,255,255,0.06);
+      box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2);
     }
-    .dl-card.disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .dl-card.disabled:hover { transform: none; border-color: rgba(255,255,255,0.08); }
+    .dl-card.disabled { opacity: 0.55; cursor: not-allowed; }
+    .dl-card.disabled:hover { transform: none; border-color: rgba(255,255,255,0.08); box-shadow: none; }
     .dl-icon {
       font-size: 36px;
       width: 64px; height: 64px;
-      border-radius: 16px;
-      margin: 0 auto 16px;
+      border-radius: 18px;
+      margin: 0 auto 18px;
       display: flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(236, 72, 153, 0.1));
       border: 1px solid rgba(129, 140, 248, 0.3);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
     }
-    .dl-title {
-      font-size: 18px; font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .dl-sub {
-      font-size: 13px; color: #94a3b8;
-      margin-bottom: 20px;
-    }
+    .dl-title { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+    .dl-sub { font-size: 13px; color: #94a3b8; margin-bottom: 22px; }
     .dl-action {
       display: inline-block;
-      padding: 10px 20px;
+      padding: 11px 22px;
       background: linear-gradient(135deg, #6366f1, #818cf8);
       color: white;
       border-radius: 10px;
       font-size: 14px; font-weight: 600;
       transition: all 0.2s;
     }
-    .dl-action:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); }
+    .dl-action:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.5); }
     .dl-action-disabled {
-      background: rgba(255,255,255,0.06);
+      background: rgba(251, 191, 36, 0.15);
       color: #fbbf24;
       cursor: not-allowed;
     }
     .qr-wrap {
-      width: 160px; height: 160px;
+      width: 168px; height: 168px;
       margin: 0 auto 16px;
-      padding: 10px;
+      padding: 12px;
       background: white;
-      border-radius: 14px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      border-radius: 16px;
+      box-shadow:
+        0 6px 24px rgba(0,0,0,0.3),
+        inset 0 0 0 1px rgba(0,0,0,0.05);
     }
     .qr-wrap img { width: 100%; height: 100%; display: block; }
-    .qr-hint {
-      font-size: 13px; color: #94a3b8;
-      margin-bottom: 10px;
-    }
 
     /* ===== Footer ===== */
     footer {
@@ -503,18 +741,19 @@
       gap: 40px;
       margin-bottom: 40px;
     }
-    .footer-brand .logo { margin-bottom: 12px; }
+    .footer-brand .logo { margin-bottom: 14px; }
     .footer-desc {
       color: #64748b; font-size: 14px; max-width: 320px;
+      line-height: 1.7;
     }
     .footer-col h4 {
-      font-size: 13px; color: #fff; font-weight: 600;
+      font-size: 12px; color: #fff; font-weight: 700;
       margin-bottom: 16px;
-      text-transform: uppercase; letter-spacing: 1px;
+      text-transform: uppercase; letter-spacing: 1.5px;
     }
     .footer-col a {
       display: block; color: #94a3b8; font-size: 14px;
-      padding: 4px 0;
+      padding: 5px 0;
       transition: color 0.2s;
     }
     .footer-col a:hover { color: #818cf8; }
@@ -525,53 +764,67 @@
       color: #64748b; font-size: 12px;
       flex-wrap: wrap; gap: 12px;
     }
+    .made-with {
+      font-size: 11px; color: #475569;
+      display: flex; align-items: center; gap: 6px;
+    }
 
     /* ===== Animations ===== */
     .fade-up {
       opacity: 0;
       transform: translateY(30px);
-      animation: fadeUp 0.8s ease forwards;
+      animation: fadeUp 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
     .fade-up.delay-1 { animation-delay: 0.1s; }
     .fade-up.delay-2 { animation-delay: 0.2s; }
     .fade-up.delay-3 { animation-delay: 0.3s; }
     .fade-up.delay-4 { animation-delay: 0.4s; }
+    .fade-up.delay-5 { animation-delay: 0.5s; }
     @keyframes fadeUp {
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Floating animation for phone */
-    @keyframes float {
-      0%, 100% { transform: rotateY(-8deg) rotateX(4deg) translateY(0); }
-      50% { transform: rotateY(-8deg) rotateX(4deg) translateY(-12px); }
+    /* Scroll-triggered animations */
+    .scroll-reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.8s, transform 0.8s;
     }
-    .phone-frame { animation: float 6s ease-in-out infinite; }
+    .scroll-reveal.in-view {
+      opacity: 1; transform: translateY(0);
+    }
 
     /* ===== Responsive ===== */
-    @media (max-width: 900px) {
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 50px; }
+      .phone-stage { max-width: 280px; }
+    }
+    @media (max-width: 760px) {
       .hero { padding: 40px 20px 60px; }
-      .hero-grid { grid-template-columns: 1fr; gap: 40px; }
-      .phone-mockup { max-width: 260px; }
       section { padding: 60px 20px; }
       .nav-links { display: none; }
       .bento { grid-template-columns: 1fr; }
-      .b-2x1, .b-3x1, .b-3x2, .b-4x1, .b-2x2 {
+      .b-2x1, .b-3x1, .b-3x2, .b-4x1 {
         grid-column: span 1; grid-row: span 1;
       }
       .footer-grid { grid-template-columns: 1fr; gap: 24px; }
       .footer-bottom { flex-direction: column; text-align: center; }
-      .download-section { padding: 40px 20px; margin: 0 16px; border-radius: 20px; }
+      .download-section { padding: 40px 20px; margin: 0 16px; border-radius: 24px; }
+      .steps { grid-template-columns: 1fr; gap: 32px; }
+      .steps::before { display: none; }
     }
     @media (max-width: 560px) {
-      .hero h1 { font-size: 38px; letter-spacing: -1px; }
+      .hero h1 { font-size: 40px; letter-spacing: -1.5px; }
       .cta-btn { width: 100%; justify-content: center; }
       .qr-wrap { width: 140px; height: 140px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
   <div class="bg-mesh"></div>
   <div class="grid-overlay"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
 
   <!-- Nav -->
   <nav class="nav">
@@ -582,6 +835,7 @@
       </a>
       <div class="nav-links">
         <a href="#features" class="nav-link">功能</a>
+        <a href="#how" class="nav-link">使用流程</a>
         <a href="#download" class="nav-link">下载</a>
         <a href="https://github.com/liweing/stock-portfolio" target="_blank" class="nav-link">GitHub</a>
       </div>
@@ -595,7 +849,7 @@
       <div>
         <div class="badge fade-up">
           <span class="badge-dot"></span>
-          v1.0.0 已上线 · 完全免费
+          v1.0.0+8 · 已支持期货 · 完全免费
         </div>
         <h1 class="fade-up delay-1">
           看清你<span class="accent">所有的</span><br>
@@ -617,50 +871,122 @@
           <div class="trust-item"><span class="trust-icon">✓</span> 完全免费</div>
           <div class="trust-item"><span class="trust-icon">✓</span> 无广告</div>
           <div class="trust-item"><span class="trust-icon">✓</span> 开源</div>
-          <div class="trust-item"><span class="trust-icon">✓</span> 隐私友好</div>
+          <div class="trust-item"><span class="trust-icon">✓</span> 数据加密</div>
         </div>
       </div>
 
       <!-- Phone Mockup -->
-      <div class="phone-mockup fade-up delay-2">
-        <div class="phone-frame">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="mock-header">投资分析</div>
-            <div class="mock-card">
-              <div class="mock-card-label">📈 今日盈亏 <span style="color:#22c55e">+0.80%</span></div>
-              <div class="mock-card-value">+¥30,558</div>
-              <div class="mock-card-pct">总市值 ¥3,842,572</div>
-            </div>
-            <div class="mock-section-title">按平台</div>
-            <div class="mock-row">
-              <div class="mock-stock">
-                <span class="mock-stock-name">富途</span>
-                <span class="mock-stock-code">8 只持仓</span>
-              </div>
-              <div style="text-align:right">
-                <div class="mock-price">¥2,031,240</div>
-                <div class="mock-pct mock-up">+¥24,278</div>
-              </div>
-            </div>
-            <div class="mock-row">
-              <div class="mock-stock">
-                <span class="mock-stock-name">支付宝</span>
-                <span class="mock-stock-code">3 只基金</span>
-              </div>
-              <div style="text-align:right">
-                <div class="mock-price">¥1,233,670</div>
-                <div class="mock-pct mock-up">+¥2,304</div>
-              </div>
-            </div>
-            <div class="mock-row">
-              <div class="mock-stock">
-                <span class="mock-stock-name">A股券商</span>
-                <span class="mock-stock-code">5 只持仓</span>
-              </div>
-              <div style="text-align:right">
-                <div class="mock-price">¥577,663</div>
-                <div class="mock-pct mock-down">-¥3,976</div>
+      <div class="phone-stage fade-up delay-2">
+        <div class="phone-mockup">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="app-mock">
+                <div class="app-header">投资分析</div>
+
+                <!-- 今日盈亏 hero -->
+                <div class="mock-hero">
+                  <div class="mock-hero-top">
+                    <div class="mock-hero-label">📈 今日盈亏</div>
+                    <div class="mock-hero-pct">+0.80%</div>
+                  </div>
+                  <div class="mock-hero-amount">+¥30,558</div>
+                  <div class="mock-hero-sub">当前总市值 ¥3,842,572</div>
+                </div>
+
+                <!-- 投资组合总览 -->
+                <div class="mock-summary">
+                  <div class="mock-summary-title">
+                    投资组合总览
+                    <span class="mock-summary-tag">¥ 人民币</span>
+                  </div>
+                  <div class="mock-grid-2">
+                    <div>
+                      <div class="mock-stat-label">总市值</div>
+                      <div class="mock-stat-value">¥3,842,572</div>
+                    </div>
+                    <div>
+                      <div class="mock-stat-label">总成本</div>
+                      <div class="mock-stat-value">¥3,786,257</div>
+                    </div>
+                    <div>
+                      <div class="mock-stat-label">总盈亏</div>
+                      <div class="mock-stat-value up">+¥56,315</div>
+                    </div>
+                    <div>
+                      <div class="mock-stat-label">收益率</div>
+                      <div class="mock-stat-value up">+1.49%</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mock-section">按平台汇总</div>
+
+                <!-- 平台 1: 富途 -->
+                <div class="mock-platform">
+                  <div class="mock-platform-row">
+                    <span class="mock-platform-tag">富途</span>
+                    <span class="mock-platform-mv">¥2,031,240</span>
+                  </div>
+                  <div class="mock-platform-grid">
+                    <div>
+                      <div class="mock-cell-label">今日</div>
+                      <div class="mock-cell-value up">+¥24,278</div>
+                    </div>
+                    <div>
+                      <div class="mock-cell-label">累计</div>
+                      <div class="mock-cell-value up">+¥143,125</div>
+                    </div>
+                    <div>
+                      <div class="mock-cell-label">收益率</div>
+                      <div class="mock-cell-value up">+7.59%</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 平台 2: 支付宝 -->
+                <div class="mock-platform">
+                  <div class="mock-platform-row">
+                    <span class="mock-platform-tag">支付宝</span>
+                    <span class="mock-platform-mv">¥1,233,670</span>
+                  </div>
+                  <div class="mock-platform-grid">
+                    <div>
+                      <div class="mock-cell-label">今日</div>
+                      <div class="mock-cell-value up">+¥2,304</div>
+                    </div>
+                    <div>
+                      <div class="mock-cell-label">累计</div>
+                      <div class="mock-cell-value up">+¥106,367</div>
+                    </div>
+                    <div>
+                      <div class="mock-cell-label">收益率</div>
+                      <div class="mock-cell-value up">+9.44%</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 平台 3: 期货 -->
+                <div class="mock-platform">
+                  <div class="mock-platform-row">
+                    <span class="mock-platform-tag">期货平台</span>
+                    <span class="mock-platform-mv">¥577,663</span>
+                  </div>
+                  <div class="mock-platform-grid">
+                    <div>
+                      <div class="mock-cell-label">今日</div>
+                      <div class="mock-cell-value down">-¥3,976</div>
+                    </div>
+                    <div>
+                      <div class="mock-cell-label">累计</div>
+                      <div class="mock-cell-value down">-¥9,176</div>
+                    </div>
+                    <div>
+                      <div class="mock-cell-label">收益率</div>
+                      <div class="mock-cell-value down">-1.56%</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -671,7 +997,7 @@
 
   <!-- Stats -->
   <section style="padding-top: 0;">
-    <div class="stats">
+    <div class="stats scroll-reveal">
       <div class="stat">
         <div class="stat-value">5</div>
         <div class="stat-label">支持市场</div>
@@ -695,22 +1021,58 @@
     </div>
   </section>
 
+  <!-- How It Works -->
+  <section id="how">
+    <div class="section-eyebrow">HOW IT WORKS</div>
+    <h2 class="section-title">三步开始<span class="accent">看清</span>你的投资</h2>
+    <p class="section-subtitle">
+      不需要授权券商账号、不需要复杂配置——只用 3 分钟就能完成首次设置。
+    </p>
+
+    <div class="steps">
+      <div class="step scroll-reveal">
+        <div class="step-number">01</div>
+        <div class="step-title">注册账户</div>
+        <div class="step-desc">
+          邮箱 + 密码即可注册<br>
+          数据云端加密同步
+        </div>
+      </div>
+      <div class="step scroll-reveal">
+        <div class="step-number">02</div>
+        <div class="step-title">录入持仓</div>
+        <div class="step-desc">
+          手动输入代码 + 数量 + 成本<br>
+          股票名称自动联网查询
+        </div>
+      </div>
+      <div class="step scroll-reveal">
+        <div class="step-number">03</div>
+        <div class="step-title">查看分析</div>
+        <div class="step-desc">
+          实时盈亏 / 按平台汇总 / 饼图分布<br>
+          一目了然
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Features Bento -->
   <section id="features">
     <div class="section-eyebrow">CORE FEATURES</div>
     <h2 class="section-title">告别多个 App<br>来回切换的<span class="accent">麻烦</span></h2>
     <p class="section-subtitle">
-      你的投资分散在富途、老虎、A股券商、支付宝里？我们把它们都聚合在一个页面。
+      你的投资分散在富途、老虎、A 股券商、支付宝里？我们把它们都聚合在一个页面。
     </p>
 
     <div class="bento">
-      <!-- Big card: Multi-platform -->
-      <div class="bento-card b-3x2 b-feature-hero">
+      <!-- Big card -->
+      <div class="bento-card b-3x2 b-feature-hero scroll-reveal">
         <div>
           <div class="bento-icon">🌍</div>
           <h3 class="bento-title">跨平台聚合</h3>
           <p class="bento-desc">
-            富途、老虎、雪球、A 股券商、支付宝、其他渠道——
+            富途、老虎、雪球、A 股券商、支付宝、期货平台——
             所有账户的持仓都聚合到同一个视图，再也不用切换 App。
           </p>
         </div>
@@ -725,34 +1087,34 @@
         </div>
       </div>
 
-      <div class="bento-card b-3x1">
+      <div class="bento-card b-3x1 scroll-reveal">
         <div class="bento-icon">📈</div>
         <h3 class="bento-title">实时行情</h3>
         <p class="bento-desc">A 股、港股、美股、场外基金、商品期货 — 一键刷新，全市场实时价格</p>
       </div>
 
-      <div class="bento-card b-3x1">
+      <div class="bento-card b-3x1 scroll-reveal">
         <div class="bento-icon">💰</div>
         <h3 class="bento-title">智能盈亏</h3>
-        <p class="bento-desc">USD / HKD / CNY 自动换算，今日盈亏 + 累计收益清晰呈现</p>
+        <p class="bento-desc">USD / HKD / CNY 自动换算成人民币，今日盈亏 + 累计收益清晰呈现</p>
       </div>
 
-      <div class="bento-card b-2x1">
+      <div class="bento-card b-2x1 scroll-reveal">
         <div class="bento-icon">📊</div>
         <h3 class="bento-title">饼图分析</h3>
         <p class="bento-desc">点击扇区放大查看个股</p>
       </div>
 
-      <div class="bento-card b-2x1">
-        <div class="bento-icon">☁️</div>
-        <h3 class="bento-title">云端同步</h3>
-        <p class="bento-desc">手机、电脑数据实时同步</p>
-      </div>
-
-      <div class="bento-card b-2x1">
+      <div class="bento-card b-2x1 scroll-reveal">
         <div class="bento-icon">⛽</div>
         <h3 class="bento-title">商品期货</h3>
         <p class="bento-desc">郑商所/上期所/大商所多品种</p>
+      </div>
+
+      <div class="bento-card b-2x1 scroll-reveal">
+        <div class="bento-icon">☁️</div>
+        <h3 class="bento-title">云端同步</h3>
+        <p class="bento-desc">手机、电脑数据实时同步</p>
       </div>
     </div>
   </section>
@@ -764,9 +1126,8 @@
       <h2 class="section-title" style="margin: 0 auto 16px;">3 分钟开始<br>看清你的<span class="accent">投资全貌</span></h2>
       <p class="section-subtitle" style="margin: 0 auto;">免费下载，无需注册即可试用 Web 版</p>
     </div>
-    <div class="download-section">
+    <div class="download-section scroll-reveal">
       <div class="download-grid">
-        <!-- Web -->
         <div class="dl-card">
           <div class="dl-icon">🌐</div>
           <div class="dl-title">Web 版</div>
@@ -774,10 +1135,9 @@
           <a href="/" class="dl-action">立即试用 →</a>
         </div>
 
-        <!-- Android with QR -->
         <div class="dl-card">
           <div class="qr-wrap">
-            <img alt="Scan QR to download Android APK"
+            <img alt="Scan to download Android APK"
                  src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&ecc=H&data=https%3A%2F%2Fstock-portfolio-topaz.vercel.app%2Fdownloads%2Fapp-release.apk">
           </div>
           <div class="dl-title">Android</div>
@@ -785,7 +1145,6 @@
           <a href="/downloads/app-release.apk" download="stock-portfolio.apk" class="dl-action">点击下载 ↓</a>
         </div>
 
-        <!-- iOS -->
         <div class="dl-card disabled">
           <div class="dl-icon" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(255,255,255,0.05)); border-color: rgba(251, 191, 36, 0.3)">⏳</div>
           <div class="dl-title">iOS</div>
@@ -812,7 +1171,7 @@
       <div class="footer-col">
         <h4>产品</h4>
         <a href="/">Web 版</a>
-        <a href="/downloads/app-release.apk" download="stock-portfolio.apk">Android 下载</a>
+        <a href="/downloads/app-release.apk" download>Android 下载</a>
         <a href="#">iOS（Coming Soon）</a>
       </div>
       <div class="footer-col">
@@ -823,10 +1182,26 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <div>© 2026 持仓助手 · 由独立开发者制作</div>
+      <div>
+        <div>© 2026 持仓助手 · 由独立开发者制作</div>
+        <div class="made-with">Built with Flutter · Powered by Supabase</div>
+      </div>
       <div>⚠️ 投资有风险，本工具仅提供数据聚合服务，不构成投资建议</div>
     </div>
   </footer>
+
+  <script>
+    // Scroll-triggered animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+  </script>
 
 </body>
 </html>
