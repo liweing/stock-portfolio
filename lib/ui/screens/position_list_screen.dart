@@ -36,6 +36,8 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
             .toList();
         await ref.read(stockRepositoryProvider).refreshPrices(inputs);
       }
+      // 刷新完行情后，自动记录今日快照
+      _saveTodaySnapshot();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -44,6 +46,18 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
       }
     } finally {
       if (mounted) setState(() => _isRefreshing = false);
+    }
+  }
+
+  /// 保存今日快照（静默，不影响用户体验）
+  void _saveTodaySnapshot() {
+    try {
+      final summary = ref.read(portfolioSummaryProvider);
+      if (!summary.isEmpty) {
+        ref.read(snapshotRepositoryProvider).saveTodaySnapshot(summary);
+      }
+    } catch (_) {
+      // 快照保存失败不影响主流程
     }
   }
 

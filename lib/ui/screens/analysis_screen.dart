@@ -7,6 +7,7 @@ import '../../providers/database_provider.dart';
 import '../../providers/portfolio_providers.dart';
 import '../widgets/pie_chart_widget.dart';
 import '../widgets/pnl_card.dart';
+import 'history_chart_screen.dart';
 
 class AnalysisScreen extends ConsumerStatefulWidget {
   const AnalysisScreen({super.key});
@@ -75,6 +76,24 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
                   dailyPnl: summary.dailyPnl,
                   dailyPnlPercent: summary.dailyPnlPercent,
                   totalMarketValue: summary.totalMarketValue,
+                ),
+
+                // 收益走势入口
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: OutlinedButton.icon(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const HistoryChartScreen(),
+                      ),
+                    ),
+                    icon: const Icon(Icons.show_chart, size: 18),
+                    label: const Text('查看收益走势'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 40),
+                    ),
+                  ),
                 ),
 
                 // 总览卡片

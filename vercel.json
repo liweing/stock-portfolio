@@ -1,6 +1,12 @@
 {
   "cleanUrls": false,
   "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/daily-snapshot",
+      "schedule": "30 8 * * 1-5"
+    }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/build/web/index.html" },
     { "source": "/:path((?!build/|api/).*)", "destination": "/build/web/:path" }

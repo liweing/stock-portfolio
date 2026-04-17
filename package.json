@@ -6,6 +6,9 @@
   "engines": {
     "node": ">=18"
   },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.0"
+  },
   "scripts": {
     "test": "node --test 'api/*.test.mjs'"
   }
