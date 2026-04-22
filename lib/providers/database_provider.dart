@@ -3,6 +3,7 @@ import '../data/database/app_database.dart';
 import '../data/repositories/cloud_position_repository.dart';
 import '../data/repositories/snapshot_repository.dart';
 import '../data/repositories/stock_repository.dart';
+import '../data/repositories/transaction_repository.dart';
 import '../data/services/stock_price_service.dart';
 import 'auth_provider.dart';
 
@@ -34,4 +35,9 @@ final stockRepositoryProvider = Provider<StockRepository>((ref) {
 /// 快照 Repository（每日收益记录）
 final snapshotRepositoryProvider = Provider<SnapshotRepository>((ref) {
   return SnapshotRepository(ref.watch(supabaseClientProvider));
+});
+
+/// 交易记录 Repository
+final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
+  return TransactionRepository(ref.watch(supabaseClientProvider));
 });
