@@ -40,6 +40,11 @@ dependencies:
   url_launcher: ^6.3.1
   shared_preferences: ^2.3.3
 
+  # 分享持仓卡片
+  screenshot: ^3.0.0
+  share_plus: ^10.0.0
+  path_provider: ^2.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

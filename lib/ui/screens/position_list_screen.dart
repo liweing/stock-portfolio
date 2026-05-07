@@ -9,6 +9,7 @@ import '../../providers/position_providers.dart';
 import '../../providers/update_provider.dart';
 import '../widgets/pnl_card.dart';
 import '../widgets/position_tile.dart';
+import '../widgets/share_card.dart';
 import '../widgets/update_checker.dart';
 import 'add_position_screen.dart';
 
@@ -65,6 +66,13 @@ class _PositionListScreenState extends ConsumerState<PositionListScreen> {
       appBar: AppBar(
         title: const Text('持仓助手'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: pnlList.isEmpty
+                ? null
+                : () => showShareCardBottomSheet(context, summary),
+            tooltip: '分享持仓卡片',
+          ),
           IconButton(
             icon: _isRefreshing
                 ? const SizedBox(
